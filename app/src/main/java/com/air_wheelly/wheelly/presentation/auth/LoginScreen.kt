@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.air_wheelly.wheelly.ui.screens
+package com.air_wheelly.wheelly.presentation.auth
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.*

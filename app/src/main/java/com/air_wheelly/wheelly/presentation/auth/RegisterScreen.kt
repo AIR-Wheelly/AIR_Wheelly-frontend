@@ -1,19 +1,25 @@
-package com.air_wheelly.wheelly.ui.screens
+package com.air_wheelly.wheelly.presentation.auth
 
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import com.air_wheelly.wheelly.domain.repository.IAuthRepository
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(repo: IAuthRepository) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -21,6 +27,9 @@ fun RegisterScreen() {
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
     var confirmPasswordError by remember { mutableStateOf("") }
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     fun onRegisterClicked() {
         emailError = ""
@@ -37,6 +46,18 @@ fun RegisterScreen() {
         }
         if (confirmPassword != password) {
             confirmPasswordError = "Passwords do not match"
+        }
+
+        try {
+            scope.launch {
+                try {
+                    val results = repo.registerUser(email, email, email, password)
+                } catch (e: HttpException) {
+                    Toast.makeText(context, "Unable to register!", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -132,10 +153,10 @@ fun RegisterScreen() {
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
     WheellyTheme {
         RegisterScreen()
     }
-}
+}*/

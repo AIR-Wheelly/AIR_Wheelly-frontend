@@ -1,4 +1,4 @@
-package com.air_wheelly.wheelly.data.dto
+package com.air_wheelly.wheelly.data
 
 import com.air_wheelly.wheelly.data.dto.body.RegistrationBody
 import com.air_wheelly.wheelly.data.dto.response.RegistrationResponse
