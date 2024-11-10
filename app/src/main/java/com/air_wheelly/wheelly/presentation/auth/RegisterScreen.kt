@@ -8,11 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import com.air_wheelly.wheelly.domain.repository.IAuthRepository
-import com.air_wheelly.wheelly.ui.theme.WheellyTheme
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -27,6 +25,7 @@ fun RegisterScreen(repo: IAuthRepository) {
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
     var confirmPasswordError by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -48,16 +47,20 @@ fun RegisterScreen(repo: IAuthRepository) {
             confirmPasswordError = "Passwords do not match"
         }
 
-        try {
+        if (emailError.isEmpty() && passwordError.isEmpty() && confirmPasswordError.isEmpty()) {
             scope.launch {
+                loading = true
                 try {
                     val results = repo.registerUser(email, email, email, password)
+                    Toast.makeText(context, "Registration successful!", Toast.LENGTH_LONG).show()
                 } catch (e: HttpException) {
                     Toast.makeText(context, "Unable to register!", Toast.LENGTH_LONG).show()
+                } catch (e: IOException) {
+                    Toast.makeText(context, "Network error!", Toast.LENGTH_LONG).show()
+                } finally {
+                    loading = false
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 
@@ -132,12 +135,18 @@ fun RegisterScreen(repo: IAuthRepository) {
 
             Button(
                 onClick = { onRegisterClicked() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !loading
             ) {
                 Text("Register")
             }
         }
 
+        if (loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -145,7 +154,6 @@ fun RegisterScreen(repo: IAuthRepository) {
                 .padding(16.dp)
         ) {
             TextButton(onClick = {
-
             }) {
                 Text("Already have an account? Login")
             }
