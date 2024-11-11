@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.air_wheelly.wheelly.ui.screens
+package com.air_wheelly.wheelly.presentation.auth
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.*
@@ -11,11 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.navigation.NavController
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    navController: NavController
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf("") }
@@ -104,7 +107,7 @@ fun LoginScreen() {
                 .padding(16.dp)
         ) {
             TextButton(onClick = {
-                // Navigate to Register screen
+                navController.navigate("registration")
             }) {
                 Text("Don't have an account? Register")
             }
@@ -112,10 +115,10 @@ fun LoginScreen() {
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
     WheellyTheme {
         LoginScreen()
     }
-}
+}*/
