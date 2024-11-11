@@ -23,10 +23,14 @@ fun RegisterScreen(
     repo: IAuthRepository,
     navController: NavController
 ) {
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
+    var firstNameError by remember { mutableStateOf("") }
+    var lastNameError by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
     var confirmPasswordError by remember { mutableStateOf("") }
@@ -41,6 +45,12 @@ fun RegisterScreen(
         confirmPasswordError = ""
         var response: User? = null
 
+        if (firstName.isEmpty()) {
+            firstNameError = "First name cannot be empty"
+        }
+        if (lastName.isEmpty()) {
+            lastNameError = "Last name cannot be empty"
+        }
         if (email.isEmpty()) {
             emailError = "Email cannot be empty"
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -57,7 +67,7 @@ fun RegisterScreen(
             scope.launch {
                 loading = true
                 try {
-                    response = repo.registerUser(email, email, email, password)
+                    response = repo.registerUser(firstName, lastName, email, password)
                     Toast.makeText(context, "Registration successful!", Toast.LENGTH_LONG).show()
                     navController.navigate("login")
                 } catch (e: HttpException) {
@@ -83,6 +93,42 @@ fun RegisterScreen(
             Text("Registration", style = MaterialTheme.typography.headlineMedium)
 
             Spacer(modifier = Modifier.height(32.dp))
+
+            TextField(
+                value = firstName,
+                onValueChange = { firstName = it },
+                label = { Text("First Name") },
+                isError = firstNameError.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth()
+            )
+            if (firstNameError.isNotEmpty()) {
+                Text(
+                    text = firstNameError,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextField(
+                value = lastName,
+                onValueChange = { lastName = it },
+                label = { Text("Last Name") },
+                isError = lastNameError.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth()
+            )
+            if (lastNameError.isNotEmpty()) {
+                Text(
+                    text = lastNameError,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             TextField(
                 value = email,
