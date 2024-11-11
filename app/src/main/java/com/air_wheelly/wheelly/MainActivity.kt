@@ -13,20 +13,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.air_wheelly.wheelly.data.repository.AuthRepositoryImpl
 import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
+import com.air_wheelly.wheelly.util.AppNavigator
 import com.air_wheelly.wheelly.util.RetrofitInstance
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val apiService = RetrofitInstance.authService
-
-        val authRepository = AuthRepositoryImpl(apiService)
-
         setContent {
             WheellyTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    RegisterScreen(repo = authRepository)
+                    AppNavigator()
                 }
             }
         }

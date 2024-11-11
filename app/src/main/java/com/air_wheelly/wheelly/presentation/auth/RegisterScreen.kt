@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.navigation.NavController
+import com.air_wheelly.wheelly.domain.model.User
 import com.air_wheelly.wheelly.domain.repository.IAuthRepository
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -17,7 +19,10 @@ import java.io.IOException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(repo: IAuthRepository) {
+fun RegisterScreen(
+    repo: IAuthRepository,
+    navController: NavController
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -34,6 +39,7 @@ fun RegisterScreen(repo: IAuthRepository) {
         emailError = ""
         passwordError = ""
         confirmPasswordError = ""
+        var response: User? = null
 
         if (email.isEmpty()) {
             emailError = "Email cannot be empty"
@@ -51,8 +57,9 @@ fun RegisterScreen(repo: IAuthRepository) {
             scope.launch {
                 loading = true
                 try {
-                    val results = repo.registerUser(email, email, email, password)
+                    response = repo.registerUser(email, email, email, password)
                     Toast.makeText(context, "Registration successful!", Toast.LENGTH_LONG).show()
+                    navController.navigate("login")
                 } catch (e: HttpException) {
                     Toast.makeText(context, "Unable to register!", Toast.LENGTH_LONG).show()
                 } catch (e: IOException) {
@@ -154,6 +161,7 @@ fun RegisterScreen(repo: IAuthRepository) {
                 .padding(16.dp)
         ) {
             TextButton(onClick = {
+                navController.navigate("login")
             }) {
                 Text("Already have an account? Login")
             }
