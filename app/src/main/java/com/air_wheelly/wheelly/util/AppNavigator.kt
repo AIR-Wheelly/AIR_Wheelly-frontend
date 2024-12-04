@@ -16,7 +16,7 @@ fun AppNavigator() {
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
-            LoginScreen(navController)
+            LoginScreen(authRepository, navController)
         }
         composable("registration") {
             RegisterScreen(authRepository, navController)

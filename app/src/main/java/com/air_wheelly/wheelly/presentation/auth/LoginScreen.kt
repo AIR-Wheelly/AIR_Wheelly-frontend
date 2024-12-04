@@ -3,26 +3,37 @@
 package com.air_wheelly.wheelly.presentation.auth
 
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
+import com.air_wheelly.wheelly.domain.repository.IAuthRepository
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    repo: IAuthRepository,
     navController: NavController
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     fun onLoginClicked() {
         emailError = ""
@@ -39,7 +50,20 @@ fun LoginScreen(
         }
 
         if (emailError.isEmpty() && passwordError.isEmpty()) {
-            println("Email: $email, Password: $password")
+            scope.launch {
+                loading = true
+                try {
+                    val user = repo.loginUser(email, password)
+                    Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+                    navController.navigate("home") // Navigate to the home screen or appropriate screen
+                } catch (e: HttpException) {
+                    Toast.makeText(context, "Unable to login!", Toast.LENGTH_LONG).show()
+                } catch (e: IOException) {
+                    Toast.makeText(context, "Network error!", Toast.LENGTH_LONG).show()
+                } finally {
+                    loading = false
+                }
+            }
         }
     }
 
@@ -95,10 +119,17 @@ fun LoginScreen(
 
             Button(
                 onClick = { onLoginClicked() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !loading
             ) {
                 Text("Login")
             }
+        }
+
+        if (loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
 
         Column(
