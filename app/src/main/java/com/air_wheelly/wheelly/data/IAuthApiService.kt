@@ -1,8 +1,6 @@
 package com.air_wheelly.wheelly.data
 
-import com.air_wheelly.wheelly.data.dto.body.LoginBody
 import com.air_wheelly.wheelly.data.dto.body.RegistrationBody
-import com.air_wheelly.wheelly.data.dto.response.LoginResponse
 import com.air_wheelly.wheelly.data.dto.response.RegistrationResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -10,8 +8,5 @@ import retrofit2.http.POST
 interface IAuthApiService {
     @POST("auth/register")
     suspend fun registerUser(@Body request: RegistrationBody) : RegistrationResponse
-
-    @POST("auth/login")
-    suspend fun loginUser(@Body request: LoginBody) : LoginResponse
 
 }
