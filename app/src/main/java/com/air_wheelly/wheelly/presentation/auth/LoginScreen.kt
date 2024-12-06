@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.repository.IAuthRepository
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
+import hr.air_wheelly.login_email_password.EmailPasswordLoginToken
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -53,7 +54,7 @@ fun LoginScreen(
             scope.launch {
                 loading = true
                 try {
-                    val user = repo.loginUser(email, password)
+                    val emailPasswordToken = EmailPasswordLoginToken(email, password)
                     Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
                     navController.navigate("home") // Navigate to the home screen or appropriate screen
                 } catch (e: HttpException) {
