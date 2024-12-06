@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Wheelly"
 include(":app")
+include(":core")
