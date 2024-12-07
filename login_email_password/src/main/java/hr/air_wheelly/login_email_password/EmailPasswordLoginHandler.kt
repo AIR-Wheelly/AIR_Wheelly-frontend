@@ -29,11 +29,11 @@ class EmailPasswordLoginHandler : LoginHandler {
         loginRequestHandler.sendRequest(
             object : ResponseListener<LoggedInUserJWT> {
                 override fun onSuccessfulResponse(response: SuccessfulResponseBody<LoggedInUserJWT>) {
-                    val loginUserData = response.data[0]
+                    val token = response.token
 
                     loginListener.onSuccessfulLogin(
                         LoginResponse(
-                            jwt = loginUserData.jwt!!
+                            token = token
                         )
                     )
                 }

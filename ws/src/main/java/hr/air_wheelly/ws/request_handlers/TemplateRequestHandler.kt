@@ -20,13 +20,37 @@ abstract class TemplateRequestHandler<T> : RequestHandler<T> {
                 response: Response<SuccessfulResponseBody<T>>
             ) {
                 if (response.isSuccessful) {
-                    responseListener.onSuccessfulResponse(response.body() as SuccessfulResponseBody<T>)
+                    val body = response.body()
+                    if (body != null) {
+                        responseListener.onSuccessfulResponse(body)
+                    } else {
+                        responseListener.onErrorResponse(
+                            ErrorResponseBody(
+                                success = false,
+                                message = "Empty response body",
+                                error_code = -1,
+                                error_message = "Empty response body"
+                            )
+                        )
+                    }
                 } else {
-                    val errorResponse = Gson().fromJson(
-                        response.errorBody()?.string(),
-                        ErrorResponseBody::class.java
-                    )
-                    responseListener.onErrorResponse(errorResponse)
+                    val errorBody = response.errorBody()?.string()
+                    try {
+                        val errorResponse = Gson().fromJson(
+                            errorBody,
+                            ErrorResponseBody::class.java
+                        )
+                        responseListener.onErrorResponse(errorResponse)
+                    } catch (e: Exception) {
+                        responseListener.onErrorResponse(
+                            ErrorResponseBody(
+                                success = false,
+                                message = "Error occurred",
+                                error_code = response.code(),
+                                error_message = errorBody ?: "Unknown error"
+                            )
+                        )
+                    }
                 }
             }
 
