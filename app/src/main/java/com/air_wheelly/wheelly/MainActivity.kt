@@ -10,11 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.air_wheelly.wheelly.data.repository.AuthRepositoryImpl
-import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
 import com.air_wheelly.wheelly.util.AppNavigator
-import com.air_wheelly.wheelly.util.RetrofitInstance
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

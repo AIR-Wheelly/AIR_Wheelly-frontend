@@ -13,18 +13,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.repository.IAuthRepository
-import com.air_wheelly.wheelly.ui.theme.WheellyTheme
 import hr.air_wheelly.login_email_password.EmailPasswordLoginHandler
 import hr.air_wheelly.login_email_password.EmailPasswordLoginToken
 import hr.air_wheelly.core.login.LoginOutcomeListener
 import hr.air_wheelly.core.login.LoginResponse
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    repo: IAuthRepository,
     navController: NavController
 ) {
     var email by remember { mutableStateOf("") }

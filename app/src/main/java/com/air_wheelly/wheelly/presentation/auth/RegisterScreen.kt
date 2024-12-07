@@ -10,9 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.model.User
-import com.air_wheelly.wheelly.domain.repository.IAuthRepository
+import hr.air_wheelly.core.network.ResponseListener
+import hr.air_wheelly.core.network.models.ErrorResponseBody
+import hr.air_wheelly.core.network.models.SuccessfulResponseBody
+import hr.air_wheelly.ws.models.RegistrationBody
+import hr.air_wheelly.ws.models.responses.RegisterResponse
+import hr.air_wheelly.ws.request_handlers.RegistrationRequestHandler
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -20,7 +26,6 @@ import java.io.IOException
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    repo: IAuthRepository,
     navController: NavController
 ) {
     var firstName by remember { mutableStateOf("") }
@@ -35,6 +40,7 @@ fun RegisterScreen(
     var passwordError by remember { mutableStateOf("") }
     var confirmPasswordError by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
+    val _errorMessage: MutableLiveData<String> = MutableLiveData("")
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -43,7 +49,6 @@ fun RegisterScreen(
         emailError = ""
         passwordError = ""
         confirmPasswordError = ""
-        var response: User? = null
 
         if (firstName.isEmpty()) {
             firstNameError = "First name cannot be empty"
@@ -66,9 +71,44 @@ fun RegisterScreen(
         if (emailError.isEmpty() && passwordError.isEmpty() && confirmPasswordError.isEmpty()) {
             scope.launch {
                 loading = true
+
+                val requestBody = RegistrationBody(
+                    firstName = firstName,
+                    lastName = lastName,
+                    email = email,
+                    password = password
+                )
+
                 try {
-                    response = repo.registerUser(firstName, lastName, email, password)
-                    Toast.makeText(context, "Registration successful!", Toast.LENGTH_LONG).show()
+                    val registrationRequestHandler = RegistrationRequestHandler(requestBody)
+
+                    registrationRequestHandler.sendRequest(object: ResponseListener<RegisterResponse> {
+                        override fun onSuccessfulResponse(response: SuccessfulResponseBody<RegisterResponse>) {
+                            Toast.makeText(context, "You have been registerd", Toast.LENGTH_SHORT).show()
+                        }
+
+                        override fun onErrorResponse(response: ErrorResponseBody) {
+                            _errorMessage.value = response.message + " "
+                            _errorMessage.value += when (response.error_code) {
+                                101 -> "Check username."
+                                102 -> "Username is already used. Please enter another one."
+                                103 -> "Email is invalid."
+                                104 -> "Email entered is already used. Do you already have an account?"
+                                105 -> "Password is invalid. Make sure it has at least 7 characters with at least 1 number."
+                                106 -> "Selected role is invalid!"
+                                107 -> "First name is invalid!"
+                                108 -> "Last name is invalid!"
+                                else -> ""
+                            }
+
+                            Toast.makeText(context, _errorMessage.value, Toast.LENGTH_SHORT).show()
+                        }
+
+                        override fun onNetworkFailure(t: Throwable) {
+                            _errorMessage.value = "Network error occured, please try again later..."
+                            Toast.makeText(context, _errorMessage.value, Toast.LENGTH_SHORT).show()
+                        }
+                    })
                     navController.navigate("login")
                 } catch (e: HttpException) {
                     Toast.makeText(context, "Unable to register!", Toast.LENGTH_LONG).show()
