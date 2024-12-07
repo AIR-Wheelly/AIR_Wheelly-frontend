@@ -1,4 +1,4 @@
-package com.air_wheelly.wheelly.data.dto.body
+package hr.air_wheelly.ws.models
 
 data class RegistrationBody(
     val firstName: String,
