@@ -10,20 +10,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.repository.IAuthRepository
-import com.air_wheelly.wheelly.ui.theme.WheellyTheme
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
+import hr.air_wheelly.login_email_password.EmailPasswordLoginHandler
+import hr.air_wheelly.login_email_password.EmailPasswordLoginToken
+import hr.air_wheelly.core.login.LoginOutcomeListener
+import hr.air_wheelly.core.login.LoginResponse
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    repo: IAuthRepository,
     navController: NavController
 ) {
     var email by remember { mutableStateOf("") }
@@ -32,9 +29,34 @@ fun LoginScreen(
     var passwordError by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    // Helper function for login
+    fun performLogin(email: String, password: String) {
+        val loginHandler = EmailPasswordLoginHandler()
+        val loginToken = EmailPasswordLoginToken(email, password)
+
+        loading = true
+
+        loginHandler.handleLogin(
+            loginToken,
+            object : LoginOutcomeListener {
+                override fun onSuccessfulLogin(loginResponse: LoginResponse) {
+                    loading = false
+                    Toast.makeText(context, "Login successful! " + loginResponse.token, Toast.LENGTH_SHORT).show()
+
+                    //navController.navigate("home")
+                }
+
+                override fun onFailedLogin(message: String) {
+                    loading = false
+                    Toast.makeText(context, "Login failed: $message", Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
+    }
+
+    // Validate and initiate login
     fun onLoginClicked() {
         emailError = ""
         passwordError = ""
@@ -50,23 +72,11 @@ fun LoginScreen(
         }
 
         if (emailError.isEmpty() && passwordError.isEmpty()) {
-            scope.launch {
-                loading = true
-                try {
-                    val user = repo.loginUser(email, password)
-                    Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-                    navController.navigate("home") // Navigate to the home screen or appropriate screen
-                } catch (e: HttpException) {
-                    Toast.makeText(context, "Unable to login!", Toast.LENGTH_LONG).show()
-                } catch (e: IOException) {
-                    Toast.makeText(context, "Network error!", Toast.LENGTH_LONG).show()
-                } finally {
-                    loading = false
-                }
-            }
+            performLogin(email, password)
         }
     }
 
+    // UI Layout
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -145,11 +155,3 @@ fun LoginScreen(
         }
     }
 }
-
-/*@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    WheellyTheme {
-        LoginScreen()
-    }
-}*/
