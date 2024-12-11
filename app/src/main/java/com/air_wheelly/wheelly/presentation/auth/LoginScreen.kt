@@ -44,8 +44,8 @@ fun LoginScreen(
                 override fun onSuccessfulLogin(loginResponse: LoginResponse) {
                     loading = false
                     Toast.makeText(context, "Login successful! " + loginResponse.token, Toast.LENGTH_SHORT).show()
+                    navController.navigate("CarListing")
 
-                    //navController.navigate("home")
                 }
 
                 override fun onFailedLogin(message: String) {
