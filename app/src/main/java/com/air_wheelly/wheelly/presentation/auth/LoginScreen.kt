@@ -41,8 +41,7 @@ fun LoginScreen(
     fun performLogin(config: ILoginConfig) {
         loading = true
         val loginHandler : LoginHandler
-
-
+      
         when (config) {
             is EmailPasswordLoginConfig -> {
                 loginHandler = EmailPasswordLoginHandler()
