@@ -10,6 +10,7 @@ class LoginRequestHandler(private val requestBody: LoginBody) :
     TemplateRequestHandler<LoggedInUserJWT>() {
     override fun getServiceCall(): Call<SuccessfulResponseBody<LoggedInUserJWT>> {
         val service = NetworkService.authService
+
         return service.loginUser(requestBody)
     }
 }

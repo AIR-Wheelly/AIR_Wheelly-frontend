@@ -9,14 +9,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import hr.air_wheelly.login_email_password.EmailPasswordLoginHandler
-import hr.air_wheelly.login_email_password.EmailPasswordLoginToken
+import hr.air_wheelly.core.login.ILoginConfig
+import hr.air_wheelly.core.login.LoginHandler
 import hr.air_wheelly.core.login.LoginOutcomeListener
 import hr.air_wheelly.core.login.LoginResponse
+import hr.air_wheelly.login_email_password.EmailPasswordLoginConfig
+import hr.air_wheelly.login_email_password.EmailPasswordLoginHandler
+import hr.air_wheelly.login_google.GoogleLoginConfig
+import hr.air_wheelly.login_google.GoogleLoginHandler
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,32 +33,48 @@ fun LoginScreen(
     var emailError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
-    val context = LocalContext.current
+    val context = LocalView.current.context
 
     // Helper function for login
-    fun performLogin(email: String, password: String) {
-        val loginHandler = EmailPasswordLoginHandler()
-        val loginToken = EmailPasswordLoginToken(email, password)
-
+    fun performLogin(config: ILoginConfig) {
         loading = true
+        val loginHandler : LoginHandler
 
-        loginHandler.handleLogin(
-            loginToken,
-            object : LoginOutcomeListener {
-                override fun onSuccessfulLogin(loginResponse: LoginResponse) {
-                    loading = false
-                    Toast.makeText(context, "Login successful! " + loginResponse.token, Toast.LENGTH_SHORT).show()
 
-                    //navController.navigate("home")
-                }
-
-                override fun onFailedLogin(message: String) {
-                    loading = false
-                    Toast.makeText(context, "Login failed: $message", Toast.LENGTH_SHORT).show()
-                }
+        when (config) {
+            is EmailPasswordLoginConfig -> {
+                loginHandler = EmailPasswordLoginHandler()
             }
-        )
+
+            is GoogleLoginConfig -> {
+                loginHandler = GoogleLoginHandler()
+            }
+
+            else -> {
+                throw Exception("Unknown login config")
+            }
+        }
+
+        coroutineScope.launch {
+            loginHandler.handleLogin(config,
+                object : LoginOutcomeListener {
+                    override fun onSuccessfulLogin(loginResponse: LoginResponse) {
+                        loading = false
+                        Toast.makeText(context, "Login successful! " + loginResponse.token, Toast.LENGTH_SHORT).show()
+
+                        navController.navigate("home")
+                    }
+
+                    override fun onFailedLogin(message: String) {
+                        loading = false
+                        Toast.makeText(context, "Login failed: $message", Toast.LENGTH_SHORT).show()
+                    }
+                })
+        }
+
+
     }
 
     // Validate and initiate login
@@ -72,8 +93,21 @@ fun LoginScreen(
         }
 
         if (emailError.isEmpty() && passwordError.isEmpty()) {
-            performLogin(email, password)
+            val emailPasswordLoginConfig = EmailPasswordLoginConfig(
+                email = email,
+                password = password
+            )
+
+            performLogin(emailPasswordLoginConfig)
         }
+    }
+
+    fun googleLogin() {
+        val googleLoginConfig = GoogleLoginConfig(
+            context = context
+        )
+
+        performLogin(googleLoginConfig)
     }
 
     // UI Layout
@@ -133,6 +167,14 @@ fun LoginScreen(
                 enabled = !loading
             ) {
                 Text("Login")
+            }
+
+            Button(
+                onClick = { googleLogin() },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !loading
+            ) {
+                Text("Google Login")
             }
         }
 

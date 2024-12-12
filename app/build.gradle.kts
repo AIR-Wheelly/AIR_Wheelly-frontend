@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.air_wheelly.wheelly"
-        minSdk = 27
+        minSdk = 34
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -59,6 +59,7 @@ dependencies {
     implementation(project(mapOf("path" to ":login_email_password")))
     implementation(project(mapOf("path" to ":core")))
     implementation(project(mapOf("path" to ":ws")))
+    implementation(project(mapOf("path" to ":login_google")))
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

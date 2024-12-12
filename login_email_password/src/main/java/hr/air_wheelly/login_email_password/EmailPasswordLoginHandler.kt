@@ -1,9 +1,9 @@
 package hr.air_wheelly.login_email_password
 
+import hr.air_wheelly.core.login.ILoginConfig
 import hr.air_wheelly.core.login.LoginHandler
 import hr.air_wheelly.core.login.LoginOutcomeListener
 import hr.air_wheelly.core.login.LoginResponse
-import hr.air_wheelly.core.login.LoginToken
 import hr.air_wheelly.core.network.ResponseListener
 import hr.air_wheelly.core.network.models.ErrorResponseBody
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
@@ -12,17 +12,20 @@ import hr.air_wheelly.ws.models.responses.LoginBody
 import hr.air_wheelly.ws.request_handlers.LoginRequestHandler
 
 class EmailPasswordLoginHandler : LoginHandler {
-    override fun handleLogin(
-        loginToken: LoginToken,
-        loginListener: LoginOutcomeListener
+    override suspend fun handleLogin(
+        loginConfig: ILoginConfig,
+        loginOutcomeListener: LoginOutcomeListener
     ) {
-        if (loginToken !is EmailPasswordLoginToken) {
+
+
+        if (loginConfig !is EmailPasswordLoginConfig) {
             throw IllegalArgumentException("Must receive valid instance for 'loginToken'!")
         }
 
-        val authorizers = loginToken.getAuthorizers()
-        val email = authorizers["email"]!!
-        val password = authorizers["password"]!!
+        val emailPasswordLoginConfig = loginConfig as EmailPasswordLoginConfig
+
+        val email = emailPasswordLoginConfig.email
+        val password = emailPasswordLoginConfig.password
 
         val loginRequestHandler = LoginRequestHandler(LoginBody(email, password))
 
@@ -31,7 +34,7 @@ class EmailPasswordLoginHandler : LoginHandler {
                 override fun onSuccessfulResponse(response: SuccessfulResponseBody<LoggedInUserJWT>) {
                     val token = response.token
 
-                    loginListener.onSuccessfulLogin(
+                    loginOutcomeListener.onSuccessfulLogin(
                         LoginResponse(
                             token = token
                         )
@@ -39,11 +42,11 @@ class EmailPasswordLoginHandler : LoginHandler {
                 }
 
                 override fun onErrorResponse(response: ErrorResponseBody) {
-                    loginListener.onFailedLogin(response.message)
+                    loginOutcomeListener.onFailedLogin(response.message)
                 }
 
                 override fun onNetworkFailure(t: Throwable) {
-                    loginListener.onFailedLogin(t.message ?: "Could not connect to network.")
+                    loginOutcomeListener.onFailedLogin(t.message ?: "Could not connect to network.")
                 }
 
             }
