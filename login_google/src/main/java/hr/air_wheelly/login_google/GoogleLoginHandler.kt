@@ -56,7 +56,8 @@ class GoogleLoginHandler : LoginHandler {
             val loginRequestHandler = TokenLoginRequestHandler(
                 GoogleLoginBody(
                 token = googleIdToken
-            )
+            ),
+                context
             )
 
             loginRequestHandler.sendRequest(

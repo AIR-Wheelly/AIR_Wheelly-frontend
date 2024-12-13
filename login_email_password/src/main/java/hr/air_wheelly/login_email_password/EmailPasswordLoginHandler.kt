@@ -1,5 +1,6 @@
 package hr.air_wheelly.login_email_password
 
+import android.content.Context
 import hr.air_wheelly.core.login.ILoginConfig
 import hr.air_wheelly.core.login.LoginHandler
 import hr.air_wheelly.core.login.LoginOutcomeListener
@@ -11,13 +12,11 @@ import hr.air_wheelly.ws.models.LoggedInUserJWT
 import hr.air_wheelly.ws.models.responses.LoginBody
 import hr.air_wheelly.ws.request_handlers.LoginRequestHandler
 
-class EmailPasswordLoginHandler : LoginHandler {
+class EmailPasswordLoginHandler(private val context: Context) : LoginHandler {
     override suspend fun handleLogin(
         loginConfig: ILoginConfig,
         loginOutcomeListener: LoginOutcomeListener
     ) {
-
-
         if (loginConfig !is EmailPasswordLoginConfig) {
             throw IllegalArgumentException("Must receive valid instance for 'loginToken'!")
         }
@@ -27,7 +26,7 @@ class EmailPasswordLoginHandler : LoginHandler {
         val email = emailPasswordLoginConfig.email
         val password = emailPasswordLoginConfig.password
 
-        val loginRequestHandler = LoginRequestHandler(LoginBody(email, password))
+        val loginRequestHandler = LoginRequestHandler(LoginBody(email, password), context)
 
         loginRequestHandler.sendRequest(
             object : ResponseListener<LoggedInUserJWT> {
@@ -48,7 +47,6 @@ class EmailPasswordLoginHandler : LoginHandler {
                 override fun onNetworkFailure(t: Throwable) {
                     loginOutcomeListener.onFailedLogin(t.message ?: "Could not connect to network.")
                 }
-
             }
         )
     }

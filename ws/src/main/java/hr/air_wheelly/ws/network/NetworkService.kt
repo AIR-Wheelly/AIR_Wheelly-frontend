@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
 object NetworkService {
     private const val BASE_URL = "http://10.0.2.2:8080/api/"
 
@@ -21,7 +22,7 @@ object NetworkService {
             .build()
     }
 
-    fun getAuthService(context: Context): AuthenticationService {
+    fun authService(context: Context): AuthenticationService {
         return getRetrofitInstance(context).create(AuthenticationService::class.java)
     }
 }

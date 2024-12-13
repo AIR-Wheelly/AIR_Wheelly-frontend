@@ -45,7 +45,7 @@ fun LoginScreen(
       
         when (config) {
             is EmailPasswordLoginConfig -> {
-                loginHandler = EmailPasswordLoginHandler()
+                loginHandler = EmailPasswordLoginHandler(context)
             }
 
             is GoogleLoginConfig -> {
