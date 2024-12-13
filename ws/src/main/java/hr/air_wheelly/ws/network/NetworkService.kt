@@ -11,4 +11,5 @@ object NetworkService {
         .build()
 
     val authService: AuthenticationService = instance.create(AuthenticationService::class.java)
+    val profileService: EditProfileService = instance.create(EditProfileService::class.java)
 }
