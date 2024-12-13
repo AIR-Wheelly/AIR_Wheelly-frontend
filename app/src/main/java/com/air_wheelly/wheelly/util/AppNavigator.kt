@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.air_wheelly.wheelly.presentation.auth.LoginScreen
 import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
+import com.air_wheelly.wheelly.presentation.car_list.CarList
 import com.air_wheelly.wheelly.presentation.car_listing.CarListingScreen
 import com.air_wheelly.wheelly.presentation.profile.ProfileEditScreen
 
@@ -25,6 +26,9 @@ fun AppNavigator() {
         }
         composable(route = "profile"){
             ProfileEditScreen(navController)
+        }
+        composable(route = "carList"){
+            CarList(navController)
         }
     }
 }
