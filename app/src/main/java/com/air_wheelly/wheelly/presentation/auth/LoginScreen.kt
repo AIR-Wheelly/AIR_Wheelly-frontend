@@ -21,6 +21,7 @@ import hr.air_wheelly.login_email_password.EmailPasswordLoginConfig
 import hr.air_wheelly.login_email_password.EmailPasswordLoginHandler
 import hr.air_wheelly.login_google.GoogleLoginConfig
 import hr.air_wheelly.login_google.GoogleLoginHandler
+import hr.air_wheelly.ws.models.TokenManager
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,9 +62,10 @@ fun LoginScreen(
                 object : LoginOutcomeListener {
                     override fun onSuccessfulLogin(loginResponse: LoginResponse) {
                         loading = false
+                        TokenManager.saveToken(context, loginResponse.token)
                         Toast.makeText(context, "Login successful! " + loginResponse.token, Toast.LENGTH_SHORT).show()
 
-                        navController.navigate("home")
+                        navController.navigate("CarListing")
                     }
 
                     override fun onFailedLogin(message: String) {
