@@ -7,6 +7,6 @@ import retrofit2.http.GET
 
 interface CarListService {
 
-    @GET("car")
+    @GET("car/carlistings")
     fun getListedCars() : Call<SuccessfulResponseBody<List<CarListResponse>>>
 }
