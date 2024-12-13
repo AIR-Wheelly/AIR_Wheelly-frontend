@@ -1,19 +1,21 @@
 package hr.air_wheelly.ws.models.responses
 
-import hr.air_wheelly.core.util.CarLocation
-import hr.air_wheelly.core.util.EnumFuelType
+import java.util.*
 
 data class CarListResponse(
-    val id: Int,
-    val manufacturer: String,
-    val model: String,
-    val year: Int,
+    val id: String,
+    val modelId: String,
+    val yearOfProduction: Int,
     val numberOfSeats: Int,
-    val fuelType: EnumFuelType,
+    val fuelType: String,
     val rentalPrice: Float,
-    val location: CarLocation,
+    val locationId: String,
+    val location: String?,
     val numberOfKilometers: Int,
     val registrationNumber: String,
     val description: String,
-    val renter: Int
+    val isActive: Boolean,
+    val userId: String,
+    val model: CarModel,
+    val carListingPictures: Base64?
 )
