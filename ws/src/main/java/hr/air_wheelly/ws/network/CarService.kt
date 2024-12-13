@@ -6,10 +6,10 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
 
-interface CarListService {
+interface CarService {
 
     @GET("car/carlistings")
-    fun getListedCars(
+    fun getCarListings(
         @Header("Authorization") token: String
-    ) : Call<SuccessfulResponseBody<ResponseCarList>>
+    ): Call<SuccessfulResponseBody<ResponseCarList>>
 }

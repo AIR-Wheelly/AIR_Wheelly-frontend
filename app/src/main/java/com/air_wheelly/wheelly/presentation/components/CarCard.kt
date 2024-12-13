@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import hr.air_wheelly.ws.models.responses.CarListResponse
+import hr.air_wheelly.core.network.CarListResponse
 
 @Composable
 fun CarCard(car: CarListResponse) {
@@ -44,10 +44,6 @@ fun CarCard(car: CarListResponse) {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(
-                    text = "${car.manufacturer} ${car.model} (${car.year})",
-                    style = MaterialTheme.typography.bodyLarge
-                )
                 Text(
                     text = "Fuel Type: ${car.fuelType}",
                     style = MaterialTheme.typography.bodySmall

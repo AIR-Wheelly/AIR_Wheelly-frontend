@@ -14,7 +14,7 @@ import com.air_wheelly.wheelly.presentation.profile.ProfileEditScreen
 fun AppNavigator() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(navController = navController, startDestination = "carList") {
         composable("login") {
             LoginScreen(navController)
         }
