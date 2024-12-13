@@ -1,7 +1,8 @@
 package com.air_wheelly.wheelly.presentation.car_list
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.Button
@@ -16,31 +17,56 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.air_wheelly.wheelly.domain.model.CarListHandler
 import com.air_wheelly.wheelly.presentation.components.CarCard
-import hr.air_wheelly.core.util.CarLocation
+import hr.air_wheelly.core.network.CarListOutcomeListener
+import hr.air_wheelly.core.network.CarListResponse
+import hr.air_wheelly.core.network.ResponseCarList
 import hr.air_wheelly.core.util.EnumFuelType
-import hr.air_wheelly.ws.models.responses.CarListResponse
+import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun CarList(
     navController: NavController
 ) {
     var searchText by remember { mutableStateOf("") }
-    var filteredCars by remember { mutableStateOf(sampleCars) }
+    //var filteredCars by remember { mutableStateOf(sampleCars) }
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedFuelType by remember { mutableStateOf<EnumFuelType?>(null) }
     var selectedManufacturer by remember { mutableStateOf("") }
     var selectedYear by remember { mutableStateOf<Int?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
-    val scrollState = rememberScrollState()
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
 
+    val carList = remember { mutableStateListOf<CarListResponse>() }
+
+
+    val carListHandler = CarListHandler()
+
+    coroutineScope.launch {
+        carListHandler.handleCarList(
+            object : CarListOutcomeListener {
+                override fun onSuccessfulCarListFetch(response: ResponseCarList) {
+                    Log.d("VRVD", response.toString())
+
+                    carList.clear()
+                    carList.addAll(response.result)
+                }
+
+                override fun onFailedCarListFetch(reason: String) {
+                    Log.d("NEKAJ_FRONT", "ERROR")
+                }
+            }
+        )
+    }
+
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        //sheetBackgroundColor = MaterialTheme.colorScheme.secondary,
         drawerElevation = 100.dp,
         sheetElevation = 100.dp,
         sheetContent = {
@@ -100,11 +126,11 @@ fun CarList(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = {
-                    filteredCars = sampleCars.filter {
+                    /*carList = sampleCars.filter {
                         (selectedFuelType == null || it.fuelType == selectedFuelType) &&
                                 (selectedManufacturer.isBlank() || it.manufacturer.contains(selectedManufacturer, ignoreCase = true)) &&
                                 (selectedYear == null || it.year == selectedYear)
-                    }
+                    }*/
                 }) {
                     Text("Apply Filters")
                 }
@@ -124,7 +150,8 @@ fun CarList(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                filteredCars.forEach { car ->
+                Log.d("ASDFFEEWFS", carList.toString())
+                carList.forEach { car ->
                     CarCard(car)
                 }
 
@@ -134,7 +161,7 @@ fun CarList(
     }
 }
 
-val sampleCars = listOf(
+/*val sampleCars = listOf(
     CarListResponse(
         id = 1,
         manufacturer = "Toyota",
@@ -177,4 +204,4 @@ val sampleCars = listOf(
         renter = 103,
         year = 2017
     )
-)
+)*/
