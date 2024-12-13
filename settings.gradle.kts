@@ -15,3 +15,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "Wheelly"
 include(":app")
+include(":core")
+include(":login_email_password")
+include(":login_email_password")
+include(":login_email_password")
+include(":ws")
+include(":ws")
+include(":login_google")
