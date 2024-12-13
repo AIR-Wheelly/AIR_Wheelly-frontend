@@ -31,13 +31,17 @@ class EmailPasswordLoginHandler(private val context: Context) : LoginHandler {
         loginRequestHandler.sendRequest(
             object : ResponseListener<LoggedInUserJWT> {
                 override fun onSuccessfulResponse(response: SuccessfulResponseBody<LoggedInUserJWT>) {
-                    val token = response.token
+                    val token = response.data.firstOrNull()?.token
 
-                    loginOutcomeListener.onSuccessfulLogin(
-                        LoginResponse(
-                            token = token
+                    if (token != null) {
+                        loginOutcomeListener.onSuccessfulLogin(
+                            LoginResponse(
+                                token = token
+                            )
                         )
-                    )
+                    } else {
+                        loginOutcomeListener.onFailedLogin("Token not found in response")
+                    }
                 }
 
                 override fun onErrorResponse(response: ErrorResponseBody) {
