@@ -17,4 +17,7 @@ interface CarService {
 
     @GET("car/getmodelsbyid/{id}")
     fun getModelsByManufacturerId(@Path("id") manufacturerId: String): Call<SuccessfulResponseBody<Array<CarModel>>>
+
+    @GET("car/getfueltype")
+    fun getFuelTypes(): Call<SuccessfulResponseBody<Array<String>>>
 }

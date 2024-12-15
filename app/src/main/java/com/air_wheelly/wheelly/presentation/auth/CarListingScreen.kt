@@ -27,16 +27,18 @@ fun CarListingScreen(
 
     val manufacturers by carViewModel.manufacturers.collectAsState()
     val models by carViewModel.models.collectAsState()
+    val fuelTypes by carViewModel.fuelTypes.collectAsState()
 
     var selectedManufacturer by remember { mutableStateOf<AllManufacturers?>(null) }
     var selectedModel by remember { mutableStateOf<CarModel?>(null) }
+    var selectedFuelType by remember { mutableStateOf<String?>(null) }
     var expandedManufacturer by remember { mutableStateOf(false) }
     var expandedModel by remember { mutableStateOf(false) }
+    var expandedFuelType by remember { mutableStateOf(false) }
 
     var model by remember { mutableStateOf(TextFieldValue("")) }
     var year by remember { mutableStateOf(TextFieldValue("")) }
     var seats by remember { mutableStateOf(TextFieldValue("")) }
-    var fuelType by remember { mutableStateOf(TextFieldValue("")) }
     var rentalPrice by remember { mutableStateOf(TextFieldValue("")) }
     var location by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -120,6 +122,38 @@ fun CarListingScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        Box {
+            OutlinedTextField(
+                value = selectedFuelType ?: "Select Fuel Type",
+                onValueChange = {},
+                label = { Text("Fuel Type") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { expandedFuelType = true }) {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                }
+            )
+            DropdownMenu(
+                expanded = expandedFuelType,
+                onDismissRequest = { expandedFuelType = false }
+            ) {
+                fuelTypes.forEach { fuelType ->
+                    DropdownMenuItem(
+                        text = { Text(text = fuelType) },
+                        onClick = {
+                            selectedFuelType = fuelType
+                            expandedFuelType = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+
         OutlinedTextField(
             value = year,
             onValueChange = { year = it },
@@ -134,16 +168,6 @@ fun CarListingScreen(
             value = seats,
             onValueChange = { seats = it },
             label = { Text("Number of Seats") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = fuelType,
-            onValueChange = { fuelType = it },
-            label = { Text("Fuel Type") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -172,9 +196,8 @@ fun CarListingScreen(
 
         Button(
             onClick = {
-                if (selectedManufacturer == null || selectedModel == null || model.text.isEmpty() || year.text.isEmpty() ||
-                    seats.text.isEmpty() || fuelType.text.isEmpty() || rentalPrice.text.isEmpty() ||
-                    location.text.isEmpty()
+                if (selectedManufacturer == null || selectedModel == null || selectedFuelType == null || model.text.isEmpty() || year.text.isEmpty() ||
+                    seats.text.isEmpty() || rentalPrice.text.isEmpty() || location.text.isEmpty()
                 ) {
                     errorMessage = "All fields are required!"
                     successMessage = null
