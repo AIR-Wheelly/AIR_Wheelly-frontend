@@ -1,42 +1,52 @@
 package com.air_wheelly.wheelly.domain.model
 
-import android.util.Log
-import hr.air_wheelly.core.network.CarListOutcomeListener
-import hr.air_wheelly.core.network.ResponseCarList
+import android.content.Context
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.network.ResponseListener
 import hr.air_wheelly.core.network.models.ErrorResponseBody
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.ws.request_handlers.CarListRequestHandler
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class CarListHandler {
-    suspend fun handleCarList(
-        carListOutcomeListener: CarListOutcomeListener
-    ) {
-        val carListRequestHandler = CarListRequestHandler()
+class CarListHandler(private val context: Context) : ViewModel() {
 
-        carListRequestHandler.sendRequest(
-            object : ResponseListener<ResponseCarList> {
-                override fun onSuccessfulResponse(response: SuccessfulResponseBody<ResponseCarList>) {
+    private val _carList = MutableStateFlow<List<CarListResponse>>(emptyList())
+    val carList: StateFlow<List<CarListResponse>> = _carList
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
 
-                    try {
-                        carListOutcomeListener.onSuccessfulCarListFetch(
-                            ResponseCarList(
-                                result = response.response.result
-                            )
-                        )
-                    } catch (e: Exception){
-                        Log.d("ERROR", "Error kod fetchanja")
+    init {
+        fetchCarList()
+    }
+
+     fun fetchCarList() {
+        val handler = CarListRequestHandler(context)
+
+        viewModelScope.launch {
+            handler.sendRequest(object : ResponseListener<List<CarListResponse>> {
+                override fun onSuccessfulResponse(response: SuccessfulResponseBody<List<CarListResponse>>) {
+                    viewModelScope.launch {
+                        _carList.value = response.result
+                        _errorMessage.value = null
                     }
                 }
 
                 override fun onErrorResponse(response: ErrorResponseBody) {
-                    Log.d("ERROR", response.error_message)
+                    viewModelScope.launch {
+                        _errorMessage.value = response.error_message
+                    }
                 }
 
                 override fun onNetworkFailure(t: Throwable) {
-                    Log.d("ERROR", "Network failure")
+                    viewModelScope.launch {
+                        _errorMessage.value = "Network failure: ${t.message}"
+                    }
                 }
-            }
-        )
+            })
+        }
     }
 }

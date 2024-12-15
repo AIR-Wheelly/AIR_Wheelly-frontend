@@ -56,7 +56,8 @@ class GoogleLoginHandler : LoginHandler {
             val loginRequestHandler = TokenLoginRequestHandler(
                 GoogleLoginBody(
                 token = googleIdToken
-            )
+            ),
+                context
             )
 
             loginRequestHandler.sendRequest(
@@ -64,11 +65,15 @@ class GoogleLoginHandler : LoginHandler {
                     override fun onSuccessfulResponse(response: SuccessfulResponseBody<LoggedInUserJWT>) {
                         val token = response.token
 
-                        loginOutcomeListener.onSuccessfulLogin(
-                            LoginResponse(
-                                token = token
+                        if (token != null) {
+                            loginOutcomeListener.onSuccessfulLogin(
+                                LoginResponse(
+                                    token = token
+                                )
                             )
-                        )
+                        } else {
+                            loginOutcomeListener.onFailedLogin("Token not found in response")
+                        }
                     }
 
                     override fun onErrorResponse(response: ErrorResponseBody) {

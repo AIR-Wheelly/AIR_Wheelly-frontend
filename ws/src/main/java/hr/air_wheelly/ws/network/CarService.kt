@@ -1,15 +1,31 @@
 package hr.air_wheelly.ws.network
 
-import hr.air_wheelly.core.network.ResponseCarList
+import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
+import hr.air_wheelly.ws.models.RegistrationBody
+import hr.air_wheelly.ws.models.responses.RegisterResponse
+import hr.air_wheelly.ws.models.responses.car.AllManufacturers
+import hr.air_wheelly.ws.models.responses.car.CarModel
+import hr.air_wheelly.ws.models.responses.car.NewCarBody
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface CarService {
+    @GET("car/getallmanafacturer")
+    fun getAllManufacturers(): Call<SuccessfulResponseBody<Array<AllManufacturers>>>
 
+    @GET("car/getmodelsbyid/{id}")
+    fun getModelsByManufacturerId(@Path("id") manufacturerId: String): Call<SuccessfulResponseBody<Array<CarModel>>>
+
+    @GET("car/getfueltype")
+    fun getFuelTypes(): Call<SuccessfulResponseBody<Array<String>>>
+
+    @POST("car/createcarlisting")
+    fun createCarListing(@Body newCarBody: NewCarBody): Call<SuccessfulResponseBody<Unit>>
+  
     @GET("car/carlistings")
-    fun getCarListings(
-        @Header("Authorization") token: String
-    ): Call<SuccessfulResponseBody<ResponseCarList>>
+    fun getListedCars(): Call<SuccessfulResponseBody<List<CarListResponse>>>
 }

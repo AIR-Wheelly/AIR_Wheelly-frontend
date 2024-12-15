@@ -80,7 +80,7 @@ fun RegisterScreen(
                 )
 
                 try {
-                    val registrationRequestHandler = RegistrationRequestHandler(requestBody)
+                    val registrationRequestHandler = RegistrationRequestHandler(requestBody, context)
 
                     registrationRequestHandler.sendRequest(object: ResponseListener<RegisterResponse> {
                         override fun onSuccessfulResponse(response: SuccessfulResponseBody<RegisterResponse>) {
