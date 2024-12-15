@@ -10,6 +10,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface CarService {
-    @GET("car/getallmanufacturers")
-    fun getAllManufectureres(): Call<SuccessfulResponseBody<List<AllManufacturers>>>
+    @GET("car/getallmanafacturer")
+    fun getAllManufacturers(): Call<SuccessfulResponseBody<Array<AllManufacturers>>>
 }

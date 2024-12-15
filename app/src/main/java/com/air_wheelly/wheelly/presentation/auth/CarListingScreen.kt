@@ -1,24 +1,34 @@
 package com.air_wheelly.wheelly.presentation.car_listing
 
+import CarViewModel
+import CarViewModelFactory
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.background
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
-import androidx.compose.material3.Divider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarListingScreen(
     navController: NavController
 ) {
+    val context = LocalContext.current
+    val carViewModel: CarViewModel = viewModel(factory = CarViewModelFactory(context))
 
-    var manufacturer by remember { mutableStateOf(TextFieldValue("")) }
+    val manufacturers by carViewModel.manufacturers.collectAsState()
+
+    var selectedManufacturer by remember { mutableStateOf<AllManufacturers?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+
     var model by remember { mutableStateOf(TextFieldValue("")) }
     var year by remember { mutableStateOf(TextFieldValue("")) }
     var seats by remember { mutableStateOf(TextFieldValue("")) }
@@ -36,103 +46,108 @@ fun CarListingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-
         Text(
             text = "List Your Car for Rent",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                color = Color.Black
-            )
+            style = MaterialTheme.typography.headlineMedium
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Input Fields for Car Listing
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center
-        ) {
+        // Manufacturer Dropdown
+        Box {
             OutlinedTextField(
-                value = manufacturer,
-                onValueChange = { manufacturer = it },
+                value = selectedManufacturer?.name ?: "Select Manufacturer",
+                onValueChange = {},
                 label = { Text("Manufacturer") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                }
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = model,
-                onValueChange = { model = it },
-                label = { Text("Model") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = year,
-                onValueChange = { year = it },
-                label = { Text("Year") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = seats,
-                onValueChange = { seats = it },
-                label = { Text("Number of Seats") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = fuelType,
-                onValueChange = { fuelType = it },
-                label = { Text("Fuel Type") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = rentalPrice,
-                onValueChange = { rentalPrice = it },
-                label = { Text("Rental Price per Day") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text("Location") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                manufacturers.forEach { manufacturer ->
+                    DropdownMenuItem(
+                        text = { Text(text = manufacturer.name) },
+                        onClick = {
+                            selectedManufacturer = manufacturer
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
 
-        Divider(
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = model,
+            onValueChange = { model = it },
+            label = { Text("Model") },
             modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-            thickness = 1.dp
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = year,
+            onValueChange = { year = it },
+            label = { Text("Year") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = seats,
+            onValueChange = { seats = it },
+            label = { Text("Number of Seats") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = fuelType,
+            onValueChange = { fuelType = it },
+            label = { Text("Fuel Type") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = rentalPrice,
+            onValueChange = { rentalPrice = it },
+            label = { Text("Rental Price per Day") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = location,
+            onValueChange = { location = it },
+            label = { Text("Location") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                if (manufacturer.text.isEmpty() || model.text.isEmpty() || year.text.isEmpty() ||
+                if (selectedManufacturer == null || model.text.isEmpty() || year.text.isEmpty() ||
                     seats.text.isEmpty() || fuelType.text.isEmpty() || rentalPrice.text.isEmpty() ||
                     location.text.isEmpty()
                 ) {
