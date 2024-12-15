@@ -15,13 +15,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.model.CarListHandler
 import com.air_wheelly.wheelly.presentation.components.CarCard
 import hr.air_wheelly.core.network.CarListOutcomeListener
 import hr.air_wheelly.core.network.CarListResponse
-import hr.air_wheelly.core.network.ResponseCarList
 import hr.air_wheelly.core.util.EnumFuelType
 import kotlinx.coroutines.launch
 
@@ -32,7 +32,6 @@ fun CarList(
     navController: NavController
 ) {
     var searchText by remember { mutableStateOf("") }
-    //var filteredCars by remember { mutableStateOf(sampleCars) }
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedFuelType by remember { mutableStateOf<EnumFuelType?>(null) }
     var selectedManufacturer by remember { mutableStateOf("") }
@@ -43,26 +42,13 @@ fun CarList(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
 
-    val carList = remember { mutableStateListOf<CarListResponse>() }
+    val context = LocalContext.current
+    val carListHandler = remember { CarListHandler(context) }
+    val carList by carListHandler.carList.collectAsState()
+    val errorMessage by carListHandler.errorMessage.collectAsState()
 
-
-    val carListHandler = CarListHandler()
-
-    coroutineScope.launch {
-        carListHandler.handleCarList(
-            object : CarListOutcomeListener {
-                override fun onSuccessfulCarListFetch(response: ResponseCarList) {
-                    Log.d("VRVD", response.toString())
-
-                    carList.clear()
-                    carList.addAll(response.result)
-                }
-
-                override fun onFailedCarListFetch(reason: String) {
-                    Log.d("NEKAJ_FRONT", "ERROR")
-                }
-            }
-        )
+    LaunchedEffect(Unit) {
+        carListHandler.fetchCarList()
     }
 
     BottomSheetScaffold(
@@ -126,11 +112,7 @@ fun CarList(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = {
-                    /*carList = sampleCars.filter {
-                        (selectedFuelType == null || it.fuelType == selectedFuelType) &&
-                                (selectedManufacturer.isBlank() || it.manufacturer.contains(selectedManufacturer, ignoreCase = true)) &&
-                                (selectedYear == null || it.year == selectedYear)
-                    }*/
+                    //TODO implement filtering
                 }) {
                     Text("Apply Filters")
                 }
@@ -150,58 +132,27 @@ fun CarList(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Log.d("ASDFFEEWFS", carList.toString())
-                carList.forEach { car ->
-                    CarCard(car)
+                if (errorMessage != null) {
+                    Text("Error: $errorMessage", color = Color.Red)
+                } else {
+                    carList.forEach { car ->
+                        CarCard(car)
+                    }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
+
+                Button(
+                    onClick = {
+                        navController.navigate("createListing")
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 30.dp)
+                ) {
+                    Text("List Your Car")
+                }
             }
         }
     }
 }
-
-/*val sampleCars = listOf(
-    CarListResponse(
-        id = 1,
-        manufacturer = "Toyota",
-        model = "Camry",
-        numberOfSeats = 5,
-        fuelType = EnumFuelType.PETROL,
-        rentalPrice = 50.0f,
-        location = CarLocation(latitude = 40.7128, longitude = -74.0060),
-        numberOfKilometers = 5000,
-        registrationNumber = "NY1234",
-        description = "A comfortable sedan, great for city rides.",
-        renter = 101,
-        year = 2015
-    ),
-    CarListResponse(
-        id = 2,
-        manufacturer = "Honda",
-        model = "Civic",
-        numberOfSeats = 5,
-        fuelType = EnumFuelType.HYBRID,
-        rentalPrice = 45.0f,
-        location = CarLocation(latitude = 37.7749, longitude = -122.4194),
-        numberOfKilometers = 20000,
-        registrationNumber = "SF5678",
-        description = "A fuel-efficient car, perfect for long drives.",
-        renter = 102,
-        year = 2016
-    ),
-    CarListResponse(
-        id = 3,
-        manufacturer = "Tesla",
-        model = "Model 3",
-        numberOfSeats = 5,
-        fuelType = EnumFuelType.ELECTRIC,
-        rentalPrice = 70.0f,
-        location = CarLocation(latitude = 34.0522, longitude = -118.2437),
-        numberOfKilometers = 10000,
-        registrationNumber = "LA91011",
-        description = "A futuristic electric car with advanced features.",
-        renter = 103,
-        year = 2017
-    )
-)*/

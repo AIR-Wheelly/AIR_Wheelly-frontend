@@ -6,12 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
 import com.air_wheelly.wheelly.util.AppNavigator
+import hr.air_wheelly.ws.models.responses.ProfileResponse
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,25 +20,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             WheellyTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    AppNavigator()
+                    val navController = rememberNavController()
+                    var user by remember { mutableStateOf<ProfileResponse?>(null) }
+                    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+                    AppNavigator(navController, user, errorMessage) { profile ->
+                        user = profile
+                        navController.navigate("createListing") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WheellyTheme {
-        Greeting("Android")
     }
 }
