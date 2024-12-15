@@ -63,7 +63,7 @@ class GoogleLoginHandler : LoginHandler {
             loginRequestHandler.sendRequest(
                 object : ResponseListener<LoggedInUserJWT> {
                     override fun onSuccessfulResponse(response: SuccessfulResponseBody<LoggedInUserJWT>) {
-                        val token = response.data.firstOrNull()?.token
+                        val token = response.token
 
                         if (token != null) {
                             loginOutcomeListener.onSuccessfulLogin(

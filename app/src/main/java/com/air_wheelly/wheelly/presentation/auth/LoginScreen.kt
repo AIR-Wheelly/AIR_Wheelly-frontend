@@ -38,7 +38,6 @@ fun LoginScreen(
 
     val context = LocalView.current.context
 
-    // Helper function for login
     fun performLogin(config: ILoginConfig) {
         loading = true
         val loginHandler : LoginHandler

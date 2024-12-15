@@ -11,6 +11,7 @@ import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.ws.models.LoggedInUserJWT
 import hr.air_wheelly.ws.models.responses.LoginBody
 import hr.air_wheelly.ws.request_handlers.LoginRequestHandler
+import android.util.Log
 
 class EmailPasswordLoginHandler(private val context: Context) : LoginHandler {
     override suspend fun handleLogin(
@@ -31,7 +32,8 @@ class EmailPasswordLoginHandler(private val context: Context) : LoginHandler {
         loginRequestHandler.sendRequest(
             object : ResponseListener<LoggedInUserJWT> {
                 override fun onSuccessfulResponse(response: SuccessfulResponseBody<LoggedInUserJWT>) {
-                    val token = response.data.firstOrNull()?.token
+                    Log.d("LoginResponse", "Response: ${response.token}")
+                    val token = response.token
 
                     if (token != null) {
                         loginOutcomeListener.onSuccessfulLogin(
