@@ -20,27 +20,27 @@ fun AppNavigator(
     errorMessage: String?,
     onLoginSuccess: (ProfileResponse) -> Unit
 ) {
-    NavHost(navController = navController, startDestination = if (user == null) "login" else "createListing") {
+    NavHost(navController = navController, startDestination = if (user == null) "login" else "carList") {
         composable("login") {
             LoginScreen(navController, onLoginSuccess)
         }
         composable("registration") {
             RegisterScreen(navController)
         }
-        composable(route = "createListing") {
+        composable(route = "profile") {
+            ProfileEditScreen(navController)
+        }
+        composable(route = "createListing"){
             user?.let {
                 CarListingScreen(navController, it)
             } ?: run {
-                // Handle the case where user is null, e.g., show an error message
                 errorMessage?.let {
                     Text(text = "Unexpected error!", color = MaterialTheme.colorScheme.error)
                 }
             }
         }
-        composable(route = "profile") {
-            ProfileEditScreen(navController)
-        }
-        composable(route = "carList"){
+
+        composable(route = "carList") {
             CarList(navController)
         }
     }

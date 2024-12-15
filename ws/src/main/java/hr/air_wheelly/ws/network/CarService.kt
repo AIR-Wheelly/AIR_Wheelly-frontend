@@ -1,5 +1,6 @@
 package hr.air_wheelly.ws.network
 
+import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.ws.models.RegistrationBody
 import hr.air_wheelly.ws.models.responses.RegisterResponse
@@ -26,5 +27,5 @@ interface CarService {
     fun createCarListing(@Body newCarBody: NewCarBody): Call<SuccessfulResponseBody<Unit>>
   
     @GET("car/carlistings")
-    fun getCarListings(): Call<SuccessfulResponseBody<ResponseCarList>>
+    fun getListedCars(): Call<SuccessfulResponseBody<List<CarListResponse>>>
 }
