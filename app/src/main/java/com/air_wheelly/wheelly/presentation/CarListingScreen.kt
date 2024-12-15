@@ -1,7 +1,10 @@
-package com.air_wheelly.wheelly.presentation.car_listing
+package com.air_wheelly.wheelly.presentation
 
 import CarViewModel
 import CarViewModelFactory
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -14,13 +17,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import hr.air_wheelly.ws.models.responses.ProfileResponse
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarModel
+import hr.air_wheelly.ws.models.responses.car.NewCarBody
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarListingScreen(
-    navController: NavController
+    navController: NavController,
+    user: ProfileResponse
 ) {
     val context = LocalContext.current
     val carViewModel: CarViewModel = viewModel(factory = CarViewModelFactory(context))
@@ -36,14 +42,29 @@ fun CarListingScreen(
     var expandedModel by remember { mutableStateOf(false) }
     var expandedFuelType by remember { mutableStateOf(false) }
 
-    var model by remember { mutableStateOf(TextFieldValue("")) }
     var year by remember { mutableStateOf(TextFieldValue("")) }
     var seats by remember { mutableStateOf(TextFieldValue("")) }
     var rentalPrice by remember { mutableStateOf(TextFieldValue("")) }
-    var location by remember { mutableStateOf(TextFieldValue("")) }
+    var numberOfKilometers by remember { mutableStateOf(TextFieldValue("")) }
+    var registrationNumber by remember { mutableStateOf(TextFieldValue("")) }
+    var description by remember { mutableStateOf(TextFieldValue("")) }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            errorMessage = "Location permission is required to list your car"
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
 
     Column(
         modifier = Modifier
@@ -153,7 +174,6 @@ fun CarListingScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-
         OutlinedTextField(
             value = year,
             onValueChange = { year = it },
@@ -185,9 +205,29 @@ fun CarListingScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = location,
-            onValueChange = { location = it },
-            label = { Text("Location") },
+            value = numberOfKilometers,
+            onValueChange = { numberOfKilometers = it },
+            label = { Text("Number of Kilometers") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = registrationNumber,
+            onValueChange = { registrationNumber = it },
+            label = { Text("Registration Number") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = { description = it },
+            label = { Text("Description") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -196,14 +236,41 @@ fun CarListingScreen(
 
         Button(
             onClick = {
-                if (selectedManufacturer == null || selectedModel == null || selectedFuelType == null || model.text.isEmpty() || year.text.isEmpty() ||
-                    seats.text.isEmpty() || rentalPrice.text.isEmpty() || location.text.isEmpty()
+                if (selectedManufacturer == null || selectedModel == null || selectedFuelType == null || year.text.isEmpty() ||
+                    seats.text.isEmpty() || rentalPrice.text.isEmpty() ||
+                    numberOfKilometers.text.isEmpty() || registrationNumber.text.isEmpty() || description.text.isEmpty()
                 ) {
                     errorMessage = "All fields are required!"
                     successMessage = null
                 } else {
-                    errorMessage = null
-                    successMessage = "Car listed successfully!"
+                    carViewModel.getCurrentLocation(
+                        onLocationReceived = { location ->
+                            carViewModel.sendLocationToApi(location) { locationId ->
+                                val newCarBody = NewCarBody(
+                                    modelId = selectedModel!!.id,
+                                    yearOfProduction = year.text.toInt(),
+                                    fuelType = selectedFuelType!!,
+                                    rentalPriceType = rentalPrice.text.toDouble(),
+                                    numberOfSeats = seats.text.toInt(),
+                                    locationId = locationId,
+                                    numberOfKilometers = numberOfKilometers.text.toDouble(),
+                                    registrationNumber = registrationNumber.text,
+                                    description = description.text,
+                                    userId = user.id
+                                )
+                                carViewModel.createCarListing(newCarBody, {
+                                    successMessage = "Car listed successfully!"
+                                    errorMessage = null
+                                }, { error ->
+                                    errorMessage = error
+                                    successMessage = null
+                                })
+                            }
+                        },
+                        onError = { error ->
+                            errorMessage = error
+                        }
+                    )
                 }
             },
             modifier = Modifier.fillMaxWidth()

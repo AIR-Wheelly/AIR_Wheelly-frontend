@@ -29,4 +29,8 @@ object NetworkService {
     fun carService(context: Context): CarService {
         return getRetrofitInstance(context).create(CarService::class.java)
     }
+
+    fun locationService(context: Context): LocationService {
+        return getRetrofitInstance(context).create(LocationService::class.java)
+    }
 }

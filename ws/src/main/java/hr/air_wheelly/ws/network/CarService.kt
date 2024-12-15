@@ -5,6 +5,7 @@ import hr.air_wheelly.ws.models.RegistrationBody
 import hr.air_wheelly.ws.models.responses.RegisterResponse
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarModel
+import hr.air_wheelly.ws.models.responses.car.NewCarBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -20,4 +21,8 @@ interface CarService {
 
     @GET("car/getfueltype")
     fun getFuelTypes(): Call<SuccessfulResponseBody<Array<String>>>
+
+    @POST("car/createcarlisting")
+    fun createCarListing(@Body newCarBody: NewCarBody): Call<SuccessfulResponseBody<Unit>>
+
 }

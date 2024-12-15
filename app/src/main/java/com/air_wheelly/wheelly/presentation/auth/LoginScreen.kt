@@ -22,12 +22,18 @@ import hr.air_wheelly.login_email_password.EmailPasswordLoginHandler
 import hr.air_wheelly.login_google.GoogleLoginConfig
 import hr.air_wheelly.login_google.GoogleLoginHandler
 import hr.air_wheelly.ws.models.TokenManager
+import hr.air_wheelly.ws.models.responses.ProfileResponse
+import hr.air_wheelly.ws.request_handlers.ProfileRequestHandler
+import hr.air_wheelly.core.network.ResponseListener
+import hr.air_wheelly.core.network.models.ErrorResponseBody
+import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
+    onLoginSuccess: (ProfileResponse) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -40,8 +46,8 @@ fun LoginScreen(
 
     fun performLogin(config: ILoginConfig) {
         loading = true
-        val loginHandler : LoginHandler
-      
+        val loginHandler: LoginHandler
+
         when (config) {
             is EmailPasswordLoginConfig -> {
                 loginHandler = EmailPasswordLoginHandler(context)
@@ -64,7 +70,20 @@ fun LoginScreen(
                         TokenManager.saveToken(context, loginResponse.token)
                         Toast.makeText(context, "Login successful! " + loginResponse.token, Toast.LENGTH_SHORT).show()
 
-                        navController.navigate("CarListing")
+                        val handler = ProfileRequestHandler(context)
+                        handler.sendRequest(object : ResponseListener<ProfileResponse> {
+                            override fun onSuccessfulResponse(response: SuccessfulResponseBody<ProfileResponse>) {
+                                onLoginSuccess(response.result)
+                            }
+
+                            override fun onErrorResponse(response: ErrorResponseBody) {
+                                Toast.makeText(context, "Error: ${response.error_message}", Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun onNetworkFailure(t: Throwable) {
+                                Toast.makeText(context, "Network failure", Toast.LENGTH_SHORT).show()
+                            }
+                        })
                     }
 
                     override fun onFailedLogin(message: String) {
@@ -73,8 +92,6 @@ fun LoginScreen(
                     }
                 })
         }
-
-
     }
 
     // Validate and initiate login
