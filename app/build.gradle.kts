@@ -68,6 +68,10 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation("androidx.compose.material:material:1.4.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.4.0")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.4.0")
+
     // RETROFIT
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")

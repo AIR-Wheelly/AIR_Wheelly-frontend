@@ -24,5 +24,7 @@ interface CarService {
 
     @POST("car/createcarlisting")
     fun createCarListing(@Body newCarBody: NewCarBody): Call<SuccessfulResponseBody<Unit>>
-
+  
+    @GET("car/carlistings")
+    fun getCarListings(): Call<SuccessfulResponseBody<ResponseCarList>>
 }

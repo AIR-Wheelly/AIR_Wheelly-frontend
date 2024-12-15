@@ -69,7 +69,6 @@ fun LoginScreen(
                         loading = false
                         TokenManager.saveToken(context, loginResponse.token)
                         Toast.makeText(context, "Login successful! " + loginResponse.token, Toast.LENGTH_SHORT).show()
-
                         val handler = ProfileRequestHandler(context)
                         handler.sendRequest(object : ResponseListener<ProfileResponse> {
                             override fun onSuccessfulResponse(response: SuccessfulResponseBody<ProfileResponse>) {
@@ -84,6 +83,7 @@ fun LoginScreen(
                                 Toast.makeText(context, "Network failure", Toast.LENGTH_SHORT).show()
                             }
                         })
+                        navController.navigate("carList")
                     }
 
                     override fun onFailedLogin(message: String) {
