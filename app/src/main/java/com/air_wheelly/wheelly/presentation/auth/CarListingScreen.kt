@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
+import hr.air_wheelly.ws.models.responses.car.CarModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,9 +26,12 @@ fun CarListingScreen(
     val carViewModel: CarViewModel = viewModel(factory = CarViewModelFactory(context))
 
     val manufacturers by carViewModel.manufacturers.collectAsState()
+    val models by carViewModel.models.collectAsState()
 
     var selectedManufacturer by remember { mutableStateOf<AllManufacturers?>(null) }
-    var expanded by remember { mutableStateOf(false) }
+    var selectedModel by remember { mutableStateOf<CarModel?>(null) }
+    var expandedManufacturer by remember { mutableStateOf(false) }
+    var expandedModel by remember { mutableStateOf(false) }
 
     var model by remember { mutableStateOf(TextFieldValue("")) }
     var year by remember { mutableStateOf(TextFieldValue("")) }
@@ -53,7 +57,6 @@ fun CarListingScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Manufacturer Dropdown
         Box {
             OutlinedTextField(
                 value = selectedManufacturer?.name ?: "Select Manufacturer",
@@ -62,21 +65,22 @@ fun CarListingScreen(
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 trailingIcon = {
-                    IconButton(onClick = { expanded = true }) {
+                    IconButton(onClick = { expandedManufacturer = true }) {
                         Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                     }
                 }
             )
             DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+                expanded = expandedManufacturer,
+                onDismissRequest = { expandedManufacturer = false }
             ) {
                 manufacturers.forEach { manufacturer ->
                     DropdownMenuItem(
                         text = { Text(text = manufacturer.name) },
                         onClick = {
                             selectedManufacturer = manufacturer
-                            expanded = false
+                            expandedManufacturer = false
+                            carViewModel.fetchModels(manufacturer.id)
                         }
                     )
                 }
@@ -85,13 +89,34 @@ fun CarListingScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
-            value = model,
-            onValueChange = { model = it },
-            label = { Text("Model") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
+        Box {
+            OutlinedTextField(
+                value = selectedModel?.name ?: "Select Model",
+                onValueChange = {},
+                label = { Text("Model") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { expandedModel = true }) {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                }
+            )
+            DropdownMenu(
+                expanded = expandedModel,
+                onDismissRequest = { expandedModel = false }
+            ) {
+                models.forEach { model ->
+                    DropdownMenuItem(
+                        text = { Text(text = model.name) },
+                        onClick = {
+                            selectedModel = model
+                            expandedModel = false
+                        }
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -147,7 +172,7 @@ fun CarListingScreen(
 
         Button(
             onClick = {
-                if (selectedManufacturer == null || model.text.isEmpty() || year.text.isEmpty() ||
+                if (selectedManufacturer == null || selectedModel == null || model.text.isEmpty() || year.text.isEmpty() ||
                     seats.text.isEmpty() || fuelType.text.isEmpty() || rentalPrice.text.isEmpty() ||
                     location.text.isEmpty()
                 ) {
