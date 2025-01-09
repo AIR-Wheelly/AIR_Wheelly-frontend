@@ -45,6 +45,10 @@ fun CarCard(car: CarListResponse) {
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
+                    text = "Model: ${car.model?.name}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
                     text = "Fuel Type: ${car.fuelType}",
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -54,6 +58,10 @@ fun CarCard(car: CarListResponse) {
                 )
                 Text(
                     text = "Location: ${car.location}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = "Year: ${car.yearOfProduction}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(

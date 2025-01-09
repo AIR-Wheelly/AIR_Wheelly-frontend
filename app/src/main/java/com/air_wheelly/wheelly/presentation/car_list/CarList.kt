@@ -1,7 +1,6 @@
 package com.air_wheelly.wheelly.presentation.car_list
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -20,13 +19,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.model.CarListHandler
 import com.air_wheelly.wheelly.presentation.components.CarCard
-import hr.air_wheelly.core.network.CarListOutcomeListener
 import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.util.EnumFuelType
-import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun CarList(
     navController: NavController
@@ -34,6 +31,7 @@ fun CarList(
     var searchText by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedFuelType by remember { mutableStateOf<EnumFuelType?>(null) }
+
     var selectedManufacturer by remember { mutableStateOf("") }
     var selectedYear by remember { mutableStateOf<Int?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -46,6 +44,16 @@ fun CarList(
     val carListHandler = remember { CarListHandler(context) }
     val carList by carListHandler.carList.collectAsState()
     val errorMessage by carListHandler.errorMessage.collectAsState()
+
+    var filteredCarList by remember { mutableStateOf(listOf<CarListResponse>()) }
+
+    LaunchedEffect(carList, selectedFuelType, selectedManufacturer, selectedYear) {
+        filteredCarList = carList.filter { car ->
+            (selectedFuelType == null || car.fuelType == selectedFuelType!!.name) &&
+                    (selectedManufacturer.isEmpty() || car.model?.manafacturerId?.contains(selectedManufacturer, ignoreCase = true) == true) &&
+                    (selectedYear == null || car.yearOfProduction == selectedYear)
+        }
+    }
 
     LaunchedEffect(Unit) {
         carListHandler.fetchCarList()
@@ -78,12 +86,19 @@ fun CarList(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text("Fuel Type", style = MaterialTheme.typography.bodyLarge)
-                Row(
+                FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    maxItemsInEachRow = 2,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     EnumFuelType.values().forEach { fuelType ->
-                        Button(onClick = { selectedFuelType = fuelType }) {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(0.45f),
+                            onClick = { selectedFuelType = if (selectedFuelType == fuelType) null else fuelType },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = if (selectedFuelType == fuelType) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+                            )
+                        ) {
                             Text(fuelType.name)
                         }
                     }
@@ -111,10 +126,15 @@ fun CarList(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(onClick = {
-                    //TODO implement filtering
-                }) {
-                    Text("Apply Filters")
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        selectedFuelType = null
+                        selectedManufacturer = ""
+                        selectedYear = null
+                    }
+                ) {
+                    Text("Clear Filters")
                 }
             }
         },
@@ -135,7 +155,7 @@ fun CarList(
                 if (errorMessage != null) {
                     Text("Error: $errorMessage", color = Color.Red)
                 } else {
-                    carList.forEach { car ->
+                    filteredCarList.forEach { car ->
                         CarCard(car)
                     }
                 }
