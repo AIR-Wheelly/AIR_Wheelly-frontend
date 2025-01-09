@@ -30,10 +30,14 @@ fun CarList(
 ) {
     var searchText by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
-    var selectedFuelType by remember { mutableStateOf<EnumFuelType?>(null) }
-
+    var selectedFuelType by remember { mutableStateOf(EnumFuelType.values().toSet()) }
     var selectedManufacturer by remember { mutableStateOf("") }
     var selectedYear by remember { mutableStateOf<Int?>(null) }
+
+    var tempSelectedFuelType by remember { mutableStateOf(EnumFuelType.values().toSet()) }
+    var tempSelectedManufacturer by remember { mutableStateOf("") }
+    var tempSelectedYear by remember { mutableStateOf<Int?>(null) }
+
     val coroutineScope = rememberCoroutineScope()
 
     val scaffoldState = rememberBottomSheetScaffoldState(
@@ -49,7 +53,7 @@ fun CarList(
 
     LaunchedEffect(carList, selectedFuelType, selectedManufacturer, selectedYear) {
         filteredCarList = carList.filter { car ->
-            (selectedFuelType == null || car.fuelType == selectedFuelType!!.name) &&
+            (selectedFuelType == null || selectedFuelType.contains(EnumFuelType.valueOf(car.fuelType!!.toUpperCase()))) &&
                     (selectedManufacturer.isEmpty() || car.model?.manafacturerId?.contains(selectedManufacturer, ignoreCase = true) == true) &&
                     (selectedYear == null || car.yearOfProduction == selectedYear)
         }
@@ -94,9 +98,11 @@ fun CarList(
                     EnumFuelType.values().forEach { fuelType ->
                         Button(
                             modifier = Modifier.fillMaxWidth(0.45f),
-                            onClick = { selectedFuelType = if (selectedFuelType == fuelType) null else fuelType },
+                            onClick = {
+                                tempSelectedFuelType = if (tempSelectedFuelType.contains(fuelType)) tempSelectedFuelType - fuelType else tempSelectedFuelType + fuelType
+                            },
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = if (selectedFuelType == fuelType) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+                                backgroundColor = if (tempSelectedFuelType.contains(fuelType)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                             )
                         ) {
                             Text(fuelType.name)
@@ -108,8 +114,8 @@ fun CarList(
 
                 Text("Manufacturer", style = MaterialTheme.typography.bodyLarge)
                 TextField(
-                    value = selectedManufacturer,
-                    onValueChange = { selectedManufacturer = it },
+                    value = tempSelectedManufacturer,
+                    onValueChange = { tempSelectedManufacturer = it },
                     label = { Text("Manufacturer") },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -118,8 +124,8 @@ fun CarList(
 
                 Text("Year", style = MaterialTheme.typography.bodyLarge)
                 TextField(
-                    value = selectedYear?.toString() ?: "",
-                    onValueChange = { selectedYear = it.toIntOrNull() },
+                    value = tempSelectedYear?.toString() ?: "",
+                    onValueChange = { tempSelectedYear = it.toIntOrNull() },
                     label = { Text("Year") },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -129,9 +135,23 @@ fun CarList(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        selectedFuelType = null
+                        selectedFuelType = tempSelectedFuelType
+                        selectedManufacturer = tempSelectedManufacturer
+                        selectedYear = tempSelectedYear
+                    }
+                ) {
+                    Text("Apply Filters")
+                }
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        selectedFuelType = EnumFuelType.values().toSet()
                         selectedManufacturer = ""
                         selectedYear = null
+                        tempSelectedFuelType = EnumFuelType.values().toSet()
+                        tempSelectedManufacturer = ""
+                        tempSelectedYear = null
                     }
                 ) {
                     Text("Clear Filters")
