@@ -57,7 +57,7 @@ fun CarCard(car: CarListResponse) {
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Rental Price: $${car.rentalPrice}/day",
+                    text = "Rental Price: $${car.rentalPriceType}/day",
                     style = MaterialTheme.typography.bodySmall
                 )
             }

@@ -8,7 +8,7 @@ data class CarListResponse(
     val year: Int?,
     val numberOfSeats: Int?,
     val fuelType: String?,
-    val rentalPrice: Float?,
+    val rentalPriceType: Float?,
     val location: CarLocation?,
     val numberOfKilometers: Int?,
     val registrationNumber: String?,
