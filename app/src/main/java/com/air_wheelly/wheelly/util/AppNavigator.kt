@@ -6,10 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.air_wheelly.wheelly.presentation.CarListingScreen
 import com.air_wheelly.wheelly.presentation.auth.LoginScreen
 import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
-import com.air_wheelly.wheelly.presentation.CarListingScreen
 import com.air_wheelly.wheelly.presentation.car_list.CarList
+import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
 import com.air_wheelly.wheelly.presentation.profile.ProfileEditScreen
 import hr.air_wheelly.ws.models.responses.ProfileResponse
 
@@ -42,6 +43,9 @@ fun AppNavigator(
 
         composable(route = "carList") {
             CarList(navController)
+        }
+        composable(route = "paymentScreen") {
+            PaymentScreen(navController)
         }
     }
 }
