@@ -7,4 +7,5 @@ sealed class NavigationItem(val route: String, val icon: Int, val title: Int) {
     object Profile : NavigationItem("profile", R.drawable.baseline_person_2_24, R.string.profile)
     object Chat : NavigationItem("chat", R.drawable.baseline_chat_24, R.string.chat)
     object History : NavigationItem("history", R.drawable.baseline_history_24, R.string.history)
+    object AddForRent : NavigationItem("createListing", R.drawable.baseline_add_box_24, R.string.addCar)
 }
