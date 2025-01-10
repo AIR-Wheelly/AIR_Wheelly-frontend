@@ -15,9 +15,10 @@ fun BottomNavigation (
     modifier : Modifier
 ) {
     val items = listOf(
+        NavigationItem.History,
+        NavigationItem.AddForRent,
         NavigationItem.Home,
         NavigationItem.Chat,
-        NavigationItem.History,
         NavigationItem.Profile
     )
 
