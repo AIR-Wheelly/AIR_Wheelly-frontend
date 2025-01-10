@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Wheelly</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="chat">Chat</string>
+    <string name="history">History</string>
 </resources>
