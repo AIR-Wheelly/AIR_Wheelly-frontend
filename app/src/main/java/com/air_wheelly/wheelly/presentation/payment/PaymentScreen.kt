@@ -19,7 +19,10 @@ import com.braintreepayments.api.DropInRequest
 @Composable
 fun PaymentScreen(
     navController: NavController,
-    dropInClient: DropInClient?
+    dropInClient: DropInClient?,
+    reservationId: String?,
+    amount: Float?,
+    onPurchaseInit: (String, Float) -> Unit
 ) {
     val context = LocalContext.current
     val dropInRequest = DropInRequest()
@@ -30,6 +33,10 @@ fun PaymentScreen(
         renterId = "renterID",
         ownerId = "ownerID"
     )
+
+    if (reservationId != null && amount != null) {
+        onPurchaseInit(reservationId, amount)
+    }
 
     fun payForCarRent() {
         Toast.makeText(context, "Start Process", Toast.LENGTH_SHORT).show()

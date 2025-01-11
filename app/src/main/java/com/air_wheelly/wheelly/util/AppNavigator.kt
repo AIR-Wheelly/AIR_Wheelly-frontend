@@ -10,7 +10,9 @@ import com.air_wheelly.wheelly.presentation.CarListingScreen
 import com.air_wheelly.wheelly.presentation.auth.LoginScreen
 import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
 import com.air_wheelly.wheelly.presentation.car_list.CarList
+import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
 import com.air_wheelly.wheelly.presentation.profile.ProfileEditScreen
+import com.braintreepayments.api.DropInClient
 import hr.air_wheelly.ws.models.responses.ProfileResponse
 
 @Composable
@@ -18,8 +20,13 @@ fun AppNavigator(
     navController: NavHostController,
     user: ProfileResponse?,
     errorMessage: String?,
+    dropInClient: DropInClient,
+    onPurchaseInit: (String, Float) -> Unit,
     onLoginSuccess: (ProfileResponse) -> Unit
 ) {
+    val reservationId = "0194574d-8326-74f9-9408-d3e2f479e8fd"
+    val amount = 20.00f
+
     NavHost(navController = navController, startDestination = if (user == null) "paymentScreen" else "carList") {
         composable("login") {
             LoginScreen(navController, onLoginSuccess)
@@ -43,9 +50,8 @@ fun AppNavigator(
         composable(route = "carList") {
             CarList(navController)
         }
-        //Launch PaymentActivity
-        /*composable(route = "paymentScreen") {
-            PaymentScreen(navController, dropInClient, createPurchase)
-        }*/
+        composable(route = "paymentScreen") {
+            PaymentScreen(navController, dropInClient, reservationId, amount, onPurchaseInit)
+        }
     }
 }

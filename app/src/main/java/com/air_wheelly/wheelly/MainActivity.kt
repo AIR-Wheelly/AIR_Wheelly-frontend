@@ -14,8 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
-import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
+import com.air_wheelly.wheelly.util.AppNavigator
 import com.braintreepayments.api.DropInClient
 import com.braintreepayments.api.DropInListener
 import com.braintreepayments.api.DropInResult
@@ -28,7 +28,9 @@ import hr.air_wheelly.ws.models.responses.payment.CreatePurchaseResponse
 import hr.air_wheelly.ws.request_handlers.CreateTransactionRequestHandler
 
 class MainActivity : FragmentActivity(), DropInListener {
+    private lateinit var onPurchaseInit: (String, Float) -> Unit
     private lateinit var createPurchase: () -> Unit
+    private lateinit var createPurchaseBody: CreatePurchaseBody
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,13 +38,17 @@ class MainActivity : FragmentActivity(), DropInListener {
         val dropInClient = DropInClient(this, tokenizationKey)
         dropInClient.setListener(this)
 
-        createPurchase = {
-            val createPurchaseBody = CreatePurchaseBody(
+        onPurchaseInit = { reservationId, amount ->
+            createPurchaseBody = CreatePurchaseBody(
                 paymentMethodNonce = "fake-valid-nonce",
                 deviceData = null,
-                amount = 20.00f,
-                reservationId = "01945708-1fc1-7c02-ba90-dbf865ca7804"
+                amount = amount,
+                reservationId = reservationId
             )
+            Toast.makeText(this, "Amount je postavlje na: " + amount.toString(), Toast.LENGTH_SHORT).show()
+        }
+
+        createPurchase = {
 
             val handler = CreateTransactionRequestHandler(this, createPurchaseBody)
 
@@ -70,14 +76,12 @@ class MainActivity : FragmentActivity(), DropInListener {
                     var user by remember { mutableStateOf<ProfileResponse?>(null) }
                     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-                    /*AppNavigator(navController, user, errorMessage, dropInClient, createPurchase) { profile ->
+                    AppNavigator(navController, user, errorMessage, dropInClient, onPurchaseInit) { profile ->
                         user = profile
                         navController.navigate("createListing") {
                             popUpTo("login") { inclusive = true }
                         }
-                    }*/
-
-                    PaymentScreen(navController, dropInClient)
+                    }
                 }
             }
         }
