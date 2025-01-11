@@ -12,6 +12,7 @@ import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
 import com.air_wheelly.wheelly.presentation.car_list.CarList
 import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
 import com.air_wheelly.wheelly.presentation.profile.ProfileEditScreen
+import com.air_wheelly.wheelly.presentation.reservations.ReservationHistoryScreen
 import com.braintreepayments.api.DropInClient
 import hr.air_wheelly.ws.models.responses.ProfileResponse
 
@@ -27,7 +28,7 @@ fun AppNavigator(
     val reservationId = "0194574d-8326-74f9-9408-d3e2f479e8fd"
     val amount = 20.00f
 
-    NavHost(navController = navController, startDestination = if (user == null) "paymentScreen" else "carList") {
+    NavHost(navController = navController, startDestination = if (user == null) "login" else "carList") {
         composable("login") {
             LoginScreen(navController, onLoginSuccess)
         }
@@ -52,6 +53,9 @@ fun AppNavigator(
         }
         composable(route = "paymentScreen") {
             PaymentScreen(navController, dropInClient, reservationId, amount, onPurchaseInit)
+        }
+        composable(route = "history") {
+            ReservationHistoryScreen(navController)
         }
     }
 }
