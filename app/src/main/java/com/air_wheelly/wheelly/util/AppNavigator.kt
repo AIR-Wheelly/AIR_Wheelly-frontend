@@ -12,6 +12,7 @@ import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
 import com.air_wheelly.wheelly.presentation.car_list.CarList
 import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
 import com.air_wheelly.wheelly.presentation.profile.ProfileEditScreen
+import com.braintreepayments.api.DropInClient
 import hr.air_wheelly.ws.models.responses.ProfileResponse
 
 @Composable
@@ -19,6 +20,7 @@ fun AppNavigator(
     navController: NavHostController,
     user: ProfileResponse?,
     errorMessage: String?,
+    dropInClient: DropInClient?,
     onLoginSuccess: (ProfileResponse) -> Unit
 ) {
     NavHost(navController = navController, startDestination = if (user == null) "login" else "carList") {
@@ -45,7 +47,7 @@ fun AppNavigator(
             CarList(navController)
         }
         composable(route = "paymentScreen") {
-            PaymentScreen(navController)
+            PaymentScreen(navController, dropInClient)
         }
     }
 }

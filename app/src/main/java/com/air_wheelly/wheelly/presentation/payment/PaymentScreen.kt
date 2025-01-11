@@ -13,12 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.braintreepayments.api.DropInClient
+import com.braintreepayments.api.DropInRequest
 
 @Composable
 fun PaymentScreen(
-    navController: NavController
+    navController: NavController,
+    dropInClient: DropInClient?
 ) {
     val context = LocalContext.current
+    val dropInRequest = DropInRequest()
 
     val mockedRentData = MockedRentData(
         daysRented = 2,
@@ -29,7 +33,9 @@ fun PaymentScreen(
 
     fun payForCarRent() {
         Toast.makeText(context, "Start Process", Toast.LENGTH_SHORT).show()
-        //TODO Braintree
+        if (dropInClient != null) {
+            dropInClient.launchDropIn(dropInRequest)
+        }
     }
 
     Column(
