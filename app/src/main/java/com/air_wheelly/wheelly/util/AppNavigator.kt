@@ -20,10 +20,10 @@ fun AppNavigator(
     navController: NavHostController,
     user: ProfileResponse?,
     errorMessage: String?,
-    dropInClient: DropInClient?,
+    dropInClient: DropInClient? = null,
     onLoginSuccess: (ProfileResponse) -> Unit
 ) {
-    NavHost(navController = navController, startDestination = if (user == null) "login" else "carList") {
+    NavHost(navController = navController, startDestination = if (user == null) "paymentScreen" else "carList") {
         composable("login") {
             LoginScreen(navController, onLoginSuccess)
         }
