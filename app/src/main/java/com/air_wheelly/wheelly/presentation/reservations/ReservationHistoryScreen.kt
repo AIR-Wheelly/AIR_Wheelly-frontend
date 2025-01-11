@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.air_wheelly.wheelly.presentation.components.ReservationCard
+import com.google.gson.Gson
 import hr.air_wheelly.core.network.ResponseListener
 import hr.air_wheelly.core.network.models.ErrorResponseBody
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
@@ -59,8 +60,12 @@ fun ReservationHistoryScreen(
                         .padding(start = 16.dp, end = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    val gson = Gson()
                     pastReservations?.forEach { reservation ->
-                        ReservationCard(reservation)
+                        ReservationCard(reservation = reservation) { clickedReservation ->
+                            val reservationJson = gson.toJson(clickedReservation)
+                            navController.navigate("paymentScreen/$reservationJson")
+                        }
                     }
                 }
             }

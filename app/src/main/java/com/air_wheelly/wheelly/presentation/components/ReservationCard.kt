@@ -1,5 +1,6 @@
 package com.air_wheelly.wheelly.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -13,12 +14,16 @@ import androidx.compose.ui.unit.dp
 import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
 
 @Composable
-fun ReservationCard(reservation: PastReservationsResponse) {
+fun ReservationCard(
+    reservation: PastReservationsResponse,
+    onClick: (PastReservationsResponse) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(top = 4.dp),
+            .padding(top = 4.dp)
+            .clickable { onClick(reservation) },
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
