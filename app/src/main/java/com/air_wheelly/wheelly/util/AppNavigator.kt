@@ -60,7 +60,7 @@ fun AppNavigator(
         ) { backStackEntry ->
             val reservationJson = backStackEntry.arguments?.getString("reservation")
             val reservation = gson.fromJson(reservationJson, PastReservationsResponse::class.java)
-            PaymentScreen(navController, dropInClient, reservation.id, reservation.totalPrice, onPurchaseInit)
+            PaymentScreen(navController, dropInClient, reservation, onPurchaseInit)
         }
         composable(route = "history") {
             ReservationHistoryScreen(navController)

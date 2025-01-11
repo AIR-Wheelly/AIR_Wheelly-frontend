@@ -15,27 +15,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.braintreepayments.api.DropInClient
 import com.braintreepayments.api.DropInRequest
+import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
 
 @Composable
 fun PaymentScreen(
     navController: NavController,
     dropInClient: DropInClient?,
-    reservationId: String?,
-    amount: Float?,
+    reservation: PastReservationsResponse?,
     onPurchaseInit: (String, Float) -> Unit
 ) {
     val context = LocalContext.current
     val dropInRequest = DropInRequest()
 
-    val mockedRentData = MockedRentData(
-        daysRented = 2,
-        pricePerDay = 10.00f,
-        renterId = "renterID",
-        ownerId = "ownerID"
-    )
-
-    if (reservationId != null && amount != null) {
-        onPurchaseInit(reservationId, amount)
+    if (reservation != null) {
+        onPurchaseInit(reservation.id, reservation.totalPrice)
     }
 
     fun payForCarRent() {
@@ -70,8 +63,8 @@ fun PaymentScreen(
                                 .weight(1f),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text("Price Per Day: ${mockedRentData.pricePerDay}€") //TODO get price per day
-                            Text("Days Rented: ${mockedRentData.daysRented}") //TODO get days rented
+                            Text("Start Date: ${reservation?.startDate}")
+                            Text("End Date: ${reservation?.endDate}")
                         }
                     }
                 }
@@ -93,8 +86,7 @@ fun PaymentScreen(
                                 .weight(1f),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            val amount = mockedRentData.daysRented * mockedRentData.pricePerDay
-                            Text("Amount to pay: ${amount}") //TODO get real amount
+                            Text("Amount to pay: ${reservation?.totalPrice}")
                         }
                     }
                 }
@@ -119,10 +111,3 @@ fun PaymentScreen(
         )
     }
 }
-
-data class MockedRentData(
-    val daysRented: Int,
-    val pricePerDay: Float,
-    val renterId: String,
-    val ownerId: String
-)
