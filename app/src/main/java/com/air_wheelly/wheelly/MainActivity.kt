@@ -34,7 +34,7 @@ class MainActivity : FragmentActivity(), DropInListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val tokenizationKey = "sandbox_w3fdp93n_tmcvwzknv5w6689h" //TODO get clientId
+        val tokenizationKey = "sandbox_w3fdp93n_tmcvwzknv5w6689h"
         val dropInClient = DropInClient(this, tokenizationKey)
         dropInClient.setListener(this)
 
@@ -45,7 +45,6 @@ class MainActivity : FragmentActivity(), DropInListener {
                 amount = amount,
                 reservationId = reservationId
             )
-            Toast.makeText(this, "Amount je postavlje na: " + amount.toString(), Toast.LENGTH_SHORT).show()
         }
 
         createPurchase = {
@@ -67,6 +66,8 @@ class MainActivity : FragmentActivity(), DropInListener {
                     }
                 }
             )
+
+            Toast.makeText(this, "Payment Successful", Toast.LENGTH_SHORT).show()
         }
 
         setContent {
