@@ -79,4 +79,7 @@ dependencies {
     // NAVIGATION
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    // BRAINTREE DROP-IN
+    implementation ("com.braintreepayments.api:drop-in:6.13.0")
 }

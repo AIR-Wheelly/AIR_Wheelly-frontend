@@ -1,7 +1,6 @@
 package com.air_wheelly.wheelly.presentation.components
 
-import android.R
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -11,18 +10,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import hr.air_wheelly.core.network.CarListResponse
+import com.air_wheelly.wheelly.util.LocalDateFormatter
+import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
 
 @Composable
-fun CarCard(car: CarListResponse) {
+fun ReservationCard(
+    reservation: PastReservationsResponse,
+    onClick: (PastReservationsResponse) -> Unit
+) {
+
+    val localDateFormatter = LocalDateFormatter()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(16.dp),
+            .padding(top = 4.dp)
+            .clickable { onClick(reservation) },
+        colors = CardDefaults.cardColors(
+            if (reservation.isPaid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+        ),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -32,41 +40,20 @@ fun CarCard(car: CarListResponse) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_menu_gallery),
-                contentDescription = "Car image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(end = 16.dp)
-            )
-
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "Model: ${car.model?.name}",
+                    text = "Start Date: ${localDateFormatter.toLocalDate(reservation.startDate)}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Fuel Type: ${car.fuelType}",
+                    text = "End Date: ${localDateFormatter.toLocalDate(reservation.endDate)}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Seats: ${car.numberOfSeats}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "Location: ${car.location}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "Year: ${car.yearOfProduction}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "Rental Price: $${car.rentalPriceType}/day",
+                    text = "Price: ${reservation.totalPrice}",
                     style = MaterialTheme.typography.bodySmall
                 )
             }
