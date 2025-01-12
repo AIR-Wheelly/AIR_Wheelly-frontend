@@ -33,4 +33,12 @@ object NetworkService {
     fun locationService(context: Context): LocationService {
         return getRetrofitInstance(context).create(LocationService::class.java)
     }
+
+    fun paymentService(context: Context): PaymentService {
+        return getRetrofitInstance(context).create(PaymentService::class.java)
+    }
+
+    fun pastReservationsService(context: Context): PastReservationsService {
+        return getRetrofitInstance(context).create(PastReservationsService::class.java)
+    }
 }
