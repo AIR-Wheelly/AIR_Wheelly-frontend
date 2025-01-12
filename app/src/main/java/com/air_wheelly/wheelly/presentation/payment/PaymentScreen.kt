@@ -1,5 +1,6 @@
 package com.air_wheelly.wheelly.presentation.payment
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -7,15 +8,21 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.air_wheelly.wheelly.presentation.components.Base64Image
 import com.braintreepayments.api.DropInClient
 import com.braintreepayments.api.DropInRequest
+import hr.air_wheelly.core.network.CarListResponse
+import hr.air_wheelly.core.network.ResponseListener
+import hr.air_wheelly.core.network.models.ErrorResponseBody
+import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
+import hr.air_wheelly.ws.request_handlers.CarByIdRequestHandler
 
 @Composable
 fun PaymentScreen(
@@ -38,8 +45,7 @@ fun PaymentScreen(
         }
     }
 
-    /*val handler = CarByIdRequestHandler(LocalContext.current, reservation!!.carListingId)
-    Log.d("ASDFWERCS", reservation.carListingId)
+    val handler = CarByIdRequestHandler(LocalContext.current, reservation!!.carListingId)
 
     var carListing by remember { mutableStateOf<CarListResponse?>(null) }
 
@@ -58,7 +64,7 @@ fun PaymentScreen(
                 Log.d("CARLISTID", t.cause.toString())
             }
         }
-    )*/
+    )
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -67,6 +73,15 @@ fun PaymentScreen(
             modifier = Modifier.weight(1f)
         ) {
             Column {
+
+                carListing?.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
+                    Base64Image(imageBase64, modifier = Modifier
+                        .align(alignment = Alignment.CenterHorizontally)
+                        .size(300.dp)
+                        .padding(top = 16.dp)
+                    )
+                }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
