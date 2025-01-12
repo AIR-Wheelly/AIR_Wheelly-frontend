@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.air_wheelly.wheelly.util.LocalDateFormatter
 import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
 
 @Composable
@@ -18,12 +19,18 @@ fun ReservationCard(
     reservation: PastReservationsResponse,
     onClick: (PastReservationsResponse) -> Unit
 ) {
+
+    val localDateFormatter = LocalDateFormatter()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(top = 4.dp)
             .clickable { onClick(reservation) },
+        colors = CardDefaults.cardColors(
+            if (reservation.isPaid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+        ),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -38,15 +45,11 @@ fun ReservationCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "ReservationId: ${reservation.id}",
+                    text = "Start Date: ${localDateFormatter.toLocalDate(reservation.startDate)}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Start Date: ${reservation.startDate}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "End Date: ${reservation.endDate}",
+                    text = "End Date: ${localDateFormatter.toLocalDate(reservation.endDate)}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
