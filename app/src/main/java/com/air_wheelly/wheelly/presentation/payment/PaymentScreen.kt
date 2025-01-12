@@ -38,6 +38,28 @@ fun PaymentScreen(
         }
     }
 
+    /*val handler = CarByIdRequestHandler(LocalContext.current, reservation!!.carListingId)
+    Log.d("ASDFWERCS", reservation.carListingId)
+
+    var carListing by remember { mutableStateOf<CarListResponse?>(null) }
+
+    handler.sendRequest(
+        object : ResponseListener<CarListResponse> {
+            override fun onSuccessfulResponse(response: SuccessfulResponseBody<CarListResponse>) {
+                carListing = response.result
+                Log.d("CARLISTID", carListing.toString())
+            }
+
+            override fun onErrorResponse(response: ErrorResponseBody) {
+                Log.d("CARLISTID", "error")
+            }
+
+            override fun onNetworkFailure(t: Throwable) {
+                Log.d("CARLISTID", t.cause.toString())
+            }
+        }
+    )*/
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {

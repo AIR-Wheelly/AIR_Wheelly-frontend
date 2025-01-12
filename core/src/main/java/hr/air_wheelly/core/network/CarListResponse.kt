@@ -18,9 +18,14 @@ data class CarListResponse(
     val userId: String?,
     val user: String?,
     val model: CarModel?,
-    val carListingPictures: ArrayList<Int>?
+    val carListingPictures: List<CarListingPicture>
 )
 
+data class CarListingPicture(
+    val id: String,
+    val carListingId: String,
+    val image: String
+)
 
 data class CarModel(
     val id: String?,
