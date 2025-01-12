@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.air_wheelly.wheelly.presentation.components.Base64Image
+import com.air_wheelly.wheelly.util.LocalDateFormatter
 import com.braintreepayments.api.DropInClient
 import com.braintreepayments.api.DropInRequest
 import hr.air_wheelly.core.network.CarListResponse
@@ -33,6 +34,7 @@ fun PaymentScreen(
 ) {
     val context = LocalContext.current
     val dropInRequest = DropInRequest()
+    val localDateFormatter = LocalDateFormatter()
 
     if (reservation != null) {
         onPurchaseInit(reservation.id, reservation.totalPrice)
@@ -100,8 +102,8 @@ fun PaymentScreen(
                                 .weight(1f),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text("Start Date: ${reservation?.startDate}")
-                            Text("End Date: ${reservation?.endDate}")
+                            Text("Start Date: ${localDateFormatter.toLocalDate(reservation.startDate)}")
+                            Text("End Date: ${localDateFormatter.toLocalDate(reservation.endDate)}")
                         }
                     }
                 }
