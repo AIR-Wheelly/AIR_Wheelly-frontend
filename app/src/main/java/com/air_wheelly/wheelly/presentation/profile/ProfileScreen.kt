@@ -1,11 +1,8 @@
 package com.air_wheelly.wheelly.presentation.profile
 
-import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,10 +11,10 @@ import com.air_wheelly.wheelly.domain.model.ProfileEditHandler
 import hr.air_wheelly.ws.models.UpdateProfileRequest
 import androidx.compose.ui.platform.LocalContext
 import com.air_wheelly.wheelly.presentation.components.BottomNavigation
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.graphics.Color
 
-@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -25,94 +22,145 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     val profileEditHandler = remember { ProfileEditHandler(context) }
-
-    // Observe user profile and error messages
     val userProfile by profileEditHandler.userProfile.collectAsState()
-    val errorMessage by profileEditHandler.errorMessage.collectAsState()
-
-    // Local state for profile editing
     var firstName by remember { mutableStateOf(userProfile?.firstName ?: "") }
     var lastName by remember { mutableStateOf(userProfile?.lastName ?: "") }
-    var email by remember { mutableStateOf(userProfile?.email ?: "") }
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
 
-    // Layout
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Profile",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 20.dp),
+                color = Color.Black,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
 
-        // Loading state
-        if (userProfile == null) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            // Display the fetched user profile
             userProfile?.let {
-                Text("First Name: ${it.firstName}")
-                Text("Last Name: ${it.lastName}")
-                Text("Email: ${it.email}")
+                Text(
+                    text = "First Name: ${it.firstName}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+                Text(
+                    text = "Last Name: ${it.lastName}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Email: ${it.email}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
 
-                // Edit fields with current user profile data
+                Spacer(modifier = Modifier.height(20.dp))
+
                 TextField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = { Text("First Name") }
+                    label = { Text("First Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
+                Spacer(modifier = Modifier.height(10.dp))
                 TextField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = { Text("Last Name") }
+                    label = { Text("Last Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") }
-                )
+                Spacer(modifier = Modifier.height(10.dp))
                 TextField(
                     value = currentPassword,
                     onValueChange = { currentPassword = it },
-                    label = { Text("Current Password") }
+                    label = { Text("Current Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
+                Spacer(modifier = Modifier.height(10.dp))
                 TextField(
                     value = newPassword,
                     onValueChange = { newPassword = it },
-                    label = { Text("New Password") }
+                    label = { Text("New Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Save Button to update profile
-                Button(onClick = {
-                    val updateProfileRequest = UpdateProfileRequest(
-                        firstName, lastName, email, currentPassword, newPassword
-                    )
-                    profileEditHandler.updateProfile(updateProfileRequest)
-                }) {
+                Button(
+                    onClick = {
+                        showDialog = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("Save Changes")
                 }
             }
+
         }
-
-        // Display error message if there is any
-        errorMessage?.let {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = it,
-                color = androidx.compose.ui.graphics.Color.Red,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-        }
-
-        // Spacer to push the BottomNavigation to the bottom
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Add Bottom Navigation
         BottomNavigation(
             navController = navController,
             modifier = Modifier
                 .padding(start = 0.dp, end = 0.dp)
                 .fillMaxWidth()
+                .align(Alignment.BottomCenter)
         )
+
+        // Confirmation Dialog
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDialog = false
+                },
+                title = {
+                    Text("Are you sure?")
+                },
+                text = {
+                    Text("Do you want to save these changes?")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val updateProfileRequest = UpdateProfileRequest(
+                                firstName, lastName, "", currentPassword, newPassword
+                            )
+                            profileEditHandler.updateProfile(updateProfileRequest)
+                            showDialog = false
+                            Toast.makeText(context, "Update successful! ",Toast.LENGTH_SHORT).show()
+                            navController.navigate("carList")
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            showDialog = false
+                        }
+                    ) {
+                        Text("No")
+                    }
+                }
+            )
+        }
     }
 }
-

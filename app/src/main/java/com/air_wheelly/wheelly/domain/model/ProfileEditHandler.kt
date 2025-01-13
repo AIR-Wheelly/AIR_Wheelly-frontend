@@ -28,7 +28,6 @@ class ProfileEditHandler(private val context: Context) : ViewModel() {
         fetchUserProfile()
     }
 
-    // Fetch user profile
     fun fetchUserProfile() {
         val handler = ProfileEditRequestHandler(context)
 
@@ -52,15 +51,13 @@ class ProfileEditHandler(private val context: Context) : ViewModel() {
         }
     }
 
-    // Update user profile
     fun updateProfile(updateProfileRequest: UpdateProfileRequest) {
         val handler = UpdateProfileRequestHandler(context, updateProfileRequest)
 
         viewModelScope.launch {
             handler.sendRequest(object : ResponseListener<UpdateProfileResponse> {
                 override fun onSuccessfulResponse(response: SuccessfulResponseBody<UpdateProfileResponse>) {
-                    _errorMessage.value = null // Clear error message on success
-                    // Optionally, refresh user profile or notify success
+                    _errorMessage.value = null
                 }
 
                 override fun onErrorResponse(response: ErrorResponseBody) {
