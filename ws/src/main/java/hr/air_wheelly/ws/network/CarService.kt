@@ -31,7 +31,7 @@ interface CarService {
     @GET("car/GetCarListingById/{id}")
     fun getCarListingById(@Path("id") carListingId: String): Call<SuccessfulResponseBody<CarListResponse>>
 
-    @POST("api/car/CreateRental")
+    @POST("car/CreateRental")
     fun createRental(@Body reservationBody: CreateNewReservationBody): Call<SuccessfulResponseBody<Unit>>
 
 }
