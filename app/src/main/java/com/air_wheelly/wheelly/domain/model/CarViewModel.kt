@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.network.ResponseListener
 import hr.air_wheelly.core.network.models.ErrorResponseBody
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
@@ -18,11 +19,7 @@ import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarLocationBody
 import hr.air_wheelly.ws.models.responses.car.CarModel
 import hr.air_wheelly.ws.models.responses.car.NewCarBody
-import hr.air_wheelly.ws.request_handlers.CarLocationRequestHandler
-import hr.air_wheelly.ws.request_handlers.CreateCarRequestHandler
-import hr.air_wheelly.ws.request_handlers.FuelTypeRequestHandler
-import hr.air_wheelly.ws.request_handlers.ManufacturerRequestHandler
-import hr.air_wheelly.ws.request_handlers.ModelRequestHandler
+import hr.air_wheelly.ws.request_handlers.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -167,6 +164,27 @@ class CarViewModel(private val context: Context) : ViewModel() {
                 viewModelScope.launch {
                     onError("Network failure")
                 }
+            }
+        })
+    }
+
+    // In CarViewModel.kt
+    fun getCarDetails(carId: String, onCarDetailsFetched: (CarListResponse) -> Unit) {
+        // Assuming you have a request handler to fetch car details
+        val handler = CarByIdRequestHandler(context, carId)
+        handler.sendRequest(object : ResponseListener<CarListResponse> {
+            override fun onSuccessfulResponse(response: SuccessfulResponseBody<CarListResponse>) {
+                viewModelScope.launch {
+                    onCarDetailsFetched(response.result)
+                }
+            }
+
+            override fun onErrorResponse(response: ErrorResponseBody) {
+                logError(response.error_message)
+            }
+
+            override fun onNetworkFailure(t: Throwable) {
+                logError("Network failure")
             }
         })
     }
