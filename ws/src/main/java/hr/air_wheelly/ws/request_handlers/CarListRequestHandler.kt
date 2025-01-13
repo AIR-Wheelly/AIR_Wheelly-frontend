@@ -9,7 +9,8 @@ import hr.air_wheelly.ws.network.NetworkService
 import retrofit2.Call
 
 
-class CarListRequestHandler(private val context: Context) :
+class
+CarListRequestHandler(private val context: Context) :
     TemplateRequestHandler<List<CarListResponse>>() {
 
     override fun getServiceCall(): Call<SuccessfulResponseBody<List<CarListResponse>>> {

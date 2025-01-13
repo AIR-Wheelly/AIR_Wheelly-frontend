@@ -14,6 +14,7 @@ import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
 import com.air_wheelly.wheelly.presentation.car_list.CarList
 import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
 import com.air_wheelly.wheelly.presentation.profile.ProfileScreen
+import com.air_wheelly.wheelly.presentation.reservations.CarReservationScreen
 import com.air_wheelly.wheelly.presentation.reservations.ReservationHistoryScreen
 import com.braintreepayments.api.DropInClient
 import com.google.gson.Gson
@@ -54,6 +55,12 @@ fun AppNavigator(
         composable(route = "carList") {
             CarList(navController)
         }
+
+        composable("car_reservation/{carId}") { backStackEntry ->
+            val carId = backStackEntry.arguments?.getString("carId")
+            CarReservationScreen(navController, carId)
+        }
+
         composable(
             route = "paymentScreen/{reservation}",
             arguments = listOf(navArgument("reservation") { type = NavType.StringType })
