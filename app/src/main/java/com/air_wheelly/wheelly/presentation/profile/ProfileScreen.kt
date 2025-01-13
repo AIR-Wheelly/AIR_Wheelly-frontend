@@ -1,166 +1,166 @@
 package com.air_wheelly.wheelly.presentation.profile
 
-import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.air_wheelly.wheelly.domain.model.ProfileEditHandler
+import hr.air_wheelly.ws.models.UpdateProfileRequest
+import androidx.compose.ui.platform.LocalContext
+import com.air_wheelly.wheelly.presentation.components.BottomNavigation
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileEditScreen(
+fun ProfileScreen(
     navController: NavController
 ) {
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-
-    var firstNameError by remember { mutableStateOf("") }
-    var lastNameError by remember { mutableStateOf("") }
-    var emailError by remember { mutableStateOf("") }
-
+    val context = LocalContext.current
+    val profileEditHandler = remember { ProfileEditHandler(context) }
+    val userProfile by profileEditHandler.userProfile.collectAsState()
+    var firstName by remember { mutableStateOf(userProfile?.firstName ?: "") }
+    var lastName by remember { mutableStateOf(userProfile?.lastName ?: "") }
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
 
-    fun validateInput(): Boolean {
-        firstNameError = if (firstName.isBlank()) "First name cannot be empty" else ""
-        lastNameError = if (lastName.isBlank()) "Last name cannot be empty" else ""
-        emailError = if (email.isBlank()) {
-            "Email cannot be empty"
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            "Invalid email format"
-        } else ""
-
-        return firstNameError.isEmpty() && lastNameError.isEmpty() && emailError.isEmpty()
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier.weight(1f)
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            Text(
+                text = "Profile",
+                style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Title at the top
+                    .fillMaxWidth()
+                    .padding(bottom = 20.dp),
+                color = Color.Black,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            userProfile?.let {
                 Text(
-                    text = "Edit Profile",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    text = "First Name: ${it.firstName}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+                Text(
+                    text = "Last Name: ${it.lastName}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
                 )
 
-                // Text fields in the middle
-                Column(
-                    modifier = Modifier.weight(1f, false),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    TextField(
-                        value = firstName,
-                        onValueChange = { firstName = it },
-                        label = { Text("First Name") },
-                        isError = firstNameError.isNotEmpty(),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    if (firstNameError.isNotEmpty()) {
-                        Text(
-                            text = firstNameError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Email: ${it.email}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    TextField(
-                        value = lastName,
-                        onValueChange = { lastName = it },
-                        label = { Text("Last Name") },
-                        isError = lastNameError.isNotEmpty(),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    if (lastNameError.isNotEmpty()) {
-                        Text(
-                            text = lastNameError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                TextField(
+                    value = firstName,
+                    onValueChange = { firstName = it },
+                    label = { Text("First Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                TextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = { Text("Last Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                TextField(
+                    value = currentPassword,
+                    onValueChange = { currentPassword = it },
+                    label = { Text("Current Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                TextField(
+                    value = newPassword,
+                    onValueChange = { newPassword = it },
+                    label = { Text("New Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    TextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Email") },
-                        isError = emailError.isNotEmpty(),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    if (emailError.isNotEmpty()) {
-                        Text(
-                            text = emailError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-
-                // Divider and button at the bottom
-                Column {
-                    Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), thickness = 1.dp)
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                            if (validateInput()) {
-                                showDialog = true
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Save Changes")
-                    }
-                }
-            }
-
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Confirm Changes") },
-                    text = { Text("Are you sure you want to save the changes?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showDialog = false
-                            navController.navigateUp()
-                        }) {
-                            Text("Confirm")
-                        }
+                Button(
+                    onClick = {
+                        showDialog = true
                     },
-                    dismissButton = {
-                        TextButton(onClick = { showDialog = false }) {
-                            Text("Cancel")
-                        }
-                    }
-                )
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Save Changes")
+                }
             }
-        }
 
-        com.air_wheelly.wheelly.presentation.components.BottomNavigation(
+        }
+        BottomNavigation(
             navController = navController,
             modifier = Modifier
                 .padding(start = 0.dp, end = 0.dp)
                 .fillMaxWidth()
+                .align(Alignment.BottomCenter)
         )
+
+        // Confirmation Dialog
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDialog = false
+                },
+                title = {
+                    Text("Are you sure?")
+                },
+                text = {
+                    Text("Do you want to save these changes?")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val updateProfileRequest = UpdateProfileRequest(
+                                firstName, lastName, "", currentPassword, newPassword
+                            )
+                            profileEditHandler.updateProfile(updateProfileRequest)
+                            showDialog = false
+                            Toast.makeText(context, "Update successful! ",Toast.LENGTH_SHORT).show()
+                            navController.navigate("carList")
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            showDialog = false
+                        }
+                    ) {
+                        Text("No")
+                    }
+                }
+            )
+        }
     }
 }
