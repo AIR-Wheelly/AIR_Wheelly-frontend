@@ -2,7 +2,11 @@ package com.air_wheelly.wheelly.presentation.reservations
 
 import CarViewModel
 import CarViewModelFactory
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,10 +21,6 @@ import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.model.CarReservationModel
 import com.air_wheelly.wheelly.presentation.components.Base64Image
 import com.air_wheelly.wheelly.presentation.components.DatePicker
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import hr.air_wheelly.core.network.CarListResponse
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -39,120 +39,141 @@ fun CarReservationScreen(
         carId?.let {
             carViewModel.getCarDetails(it) { fetchedCar ->
                 car = fetchedCar
-                println("Car fetched: $car")
             }
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Reserve Car", style = MaterialTheme.typography.headlineMedium)
 
-        car?.let {
+    car?.let {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             it.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
                 Base64Image(
                     base64String = imageBase64,
                     modifier = Modifier
-                        .size(300.dp)
-                        .padding(bottom = 16.dp)
+                        .fillMaxWidth()
+                        .height(250.dp)
                 )
             }
 
-            Text(text = "Model: ${it.model?.name}", style = MaterialTheme.typography.headlineSmall)
-            Text(text = "Fuel Type: ${it.fuelType}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Seats: ${it.numberOfSeats}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Location: ${it.location?.adress ?: "Unknown"}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Year: ${it.yearOfProduction}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Rental Price: $${it.rentalPriceType}/day", style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.height(25.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val startDate = remember { mutableStateOf<LocalDate?>(null) }
-            val endDate = remember { mutableStateOf<LocalDate?>(null) }
-            var totalPrice by remember { mutableStateOf(0.0) }
-
-            DatePicker(
-                label = "Select Start Date",
-                selectedDate = startDate.value,
-                onDateSelected = { date -> startDate.value = date }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            DatePicker(
-                label = "Select End Date",
-                selectedDate = endDate.value,
-                onDateSelected = { date -> endDate.value = date }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (startDate.value != null && endDate.value != null) {
-                val rentalPricePerDay = it.rentalPriceType?.toDouble() ?: 0.0
-                val reservationModel = CarReservationModel(
-                    startDate = startDate.value!!,
-                    endDate = endDate.value!!,
-                    rentalPricePerDay = rentalPricePerDay
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = it.model?.name ?: "Unknown Model",
+                    style = MaterialTheme.typography.headlineMedium
                 )
-                totalPrice = reservationModel.calculateTotalPrice()
-                Text(text = "Total Price: $$totalPrice", style = MaterialTheme.typography.bodyLarge)
-            }
+                Text(
+                    text = "${it.yearOfProduction} | ${it.fuelType} | ${it.numberOfSeats} Seats",
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                it.location?.let { location ->
+                    val locationText = "Show on map"
+                    val locationUri = "geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(${location.adress})"
 
-            Button(onClick = {
+                    Text(
+                        text = locationText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(locationUri))
+                            intent.setPackage("com.google.android.apps.maps")
+                            context.startActivity(intent)
+                        }
+                    )
+                } ?: Text(
+                    text = "Location: Unknown",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = "Rental Price: $${it.rentalPriceType}/day",
+                    style = MaterialTheme.typography.bodyLarge,
+                    //color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val startDate = remember { mutableStateOf<LocalDate?>(null) }
+                val endDate = remember { mutableStateOf<LocalDate?>(null) }
+                var totalPrice by remember { mutableStateOf(0.0) }
+
+                DatePicker(
+                    label = "Select Start Date",
+                    selectedDate = startDate.value,
+                    onDateSelected = { date -> startDate.value = date }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                DatePicker(
+                    label = "Select End Date",
+                    selectedDate = endDate.value,
+                    onDateSelected = { date -> endDate.value = date }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 if (startDate.value != null && endDate.value != null) {
+                    val rentalPricePerDay = it.rentalPriceType?.toDouble() ?: 0.0
                     val reservationModel = CarReservationModel(
                         startDate = startDate.value!!,
                         endDate = endDate.value!!,
-                        rentalPricePerDay = it.rentalPriceType?.toDouble() ?: 0.0
+                        rentalPricePerDay = rentalPricePerDay
                     )
-                    coroutineScope.launch {
-                        val result = reservationModel.createReservation(context, it.id ?: return@launch)
-                        if (result.isSuccess) {
-                            Toast.makeText(context, "Reservation successful", Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
-                        } else {
-                            Toast.makeText(context, "Failed to create reservation", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } else {
-                    Toast.makeText(context, "Please select both start and end dates", Toast.LENGTH_SHORT).show()
-                }
-            }) {
-                Text("Reserve Car")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            it.location?.let { location ->
-                val cameraPositionState = rememberCameraPositionState {
-                    position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(
-                        com.google.android.gms.maps.model.LatLng(location.latitude, location.longitude), 10f
-                    )
+                    totalPrice = reservationModel.calculateTotalPrice()
+                    Text(text = "Total Price: $$totalPrice", style = MaterialTheme.typography.bodyLarge)
                 }
 
-                val markerState = rememberMarkerState(
-                    position = com.google.android.gms.maps.model.LatLng(location.latitude, location.longitude)
-                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-                GoogleMap(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    cameraPositionState = cameraPositionState
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Marker(
-                        state = markerState,
-                        title = location.adress
-                    )
+                    Button(
+                        onClick = {
+                            if (startDate.value != null && endDate.value != null) {
+                                val reservationModel = CarReservationModel(
+                                    startDate = startDate.value!!,
+                                    endDate = endDate.value!!,
+                                    rentalPricePerDay = it.rentalPriceType?.toDouble() ?: 0.0
+                                )
+                                coroutineScope.launch {
+                                    val result = reservationModel.createReservation(context, it.id ?: return@launch)
+                                    if (result.isSuccess) {
+                                        Toast.makeText(context, "Reservation successful", Toast.LENGTH_SHORT).show()
+                                        navController.popBackStack()
+                                    } else {
+                                        Toast.makeText(context, "Failed to create reservation", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(context, "Please select both start and end dates", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Text("Reserve Car")
+                    }
                 }
             }
+        }
+    } ?: run {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }
