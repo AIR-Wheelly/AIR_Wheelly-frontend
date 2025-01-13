@@ -60,7 +60,7 @@ fun CarCard(car: CarListResponse, onClick: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Location: ${car.location}",
+                    text = "Location: ${car.location?.adress ?: "Unknown"}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
