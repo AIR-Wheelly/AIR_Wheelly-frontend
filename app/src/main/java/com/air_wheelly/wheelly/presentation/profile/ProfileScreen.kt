@@ -1,162 +1,113 @@
 package com.air_wheelly.wheelly.presentation.profile
 
-import android.util.Patterns
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.air_wheelly.wheelly.domain.model.ProfileEditHandler
+import hr.air_wheelly.ws.models.UpdateProfileRequest
+import androidx.compose.ui.platform.LocalContext
+import com.air_wheelly.wheelly.presentation.components.BottomNavigation
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileEditScreen(
+fun ProfileScreen(
     navController: NavController
 ) {
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val profileEditHandler = remember { ProfileEditHandler(context) }
 
-    var firstNameError by remember { mutableStateOf("") }
-    var lastNameError by remember { mutableStateOf("") }
-    var emailError by remember { mutableStateOf("") }
+    // Observe user profile and error messages
+    val userProfile by profileEditHandler.userProfile.collectAsState()
+    val errorMessage by profileEditHandler.errorMessage.collectAsState()
 
-    var showDialog by remember { mutableStateOf(false) }
+    // Local state for profile editing
+    var firstName by remember { mutableStateOf(userProfile?.firstName ?: "") }
+    var lastName by remember { mutableStateOf(userProfile?.lastName ?: "") }
+    var email by remember { mutableStateOf(userProfile?.email ?: "") }
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
 
-    fun validateInput(): Boolean {
-        firstNameError = if (firstName.isBlank()) "First name cannot be empty" else ""
-        lastNameError = if (lastName.isBlank()) "Last name cannot be empty" else ""
-        emailError = if (email.isBlank()) {
-            "Email cannot be empty"
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            "Invalid email format"
-        } else ""
+    // Layout
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
-        return firstNameError.isEmpty() && lastNameError.isEmpty() && emailError.isEmpty()
-    }
+        // Loading state
+        if (userProfile == null) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        } else {
+            // Display the fetched user profile
+            userProfile?.let {
+                Text("First Name: ${it.firstName}")
+                Text("Last Name: ${it.lastName}")
+                Text("Email: ${it.email}")
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Title at the top
-                Text(
-                    text = "Edit Profile",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Edit fields with current user profile data
+                TextField(
+                    value = firstName,
+                    onValueChange = { firstName = it },
+                    label = { Text("First Name") }
+                )
+                TextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = { Text("Last Name") }
+                )
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") }
+                )
+                TextField(
+                    value = currentPassword,
+                    onValueChange = { currentPassword = it },
+                    label = { Text("Current Password") }
+                )
+                TextField(
+                    value = newPassword,
+                    onValueChange = { newPassword = it },
+                    label = { Text("New Password") }
                 )
 
-                // Text fields in the middle
-                Column(
-                    modifier = Modifier.weight(1f, false),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    TextField(
-                        value = firstName,
-                        onValueChange = { firstName = it },
-                        label = { Text("First Name") },
-                        isError = firstNameError.isNotEmpty(),
-                        modifier = Modifier.fillMaxWidth()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Save Button to update profile
+                Button(onClick = {
+                    val updateProfileRequest = UpdateProfileRequest(
+                        firstName, lastName, email, currentPassword, newPassword
                     )
-                    if (firstNameError.isNotEmpty()) {
-                        Text(
-                            text = firstNameError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    TextField(
-                        value = lastName,
-                        onValueChange = { lastName = it },
-                        label = { Text("Last Name") },
-                        isError = lastNameError.isNotEmpty(),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    if (lastNameError.isNotEmpty()) {
-                        Text(
-                            text = lastNameError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    TextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Email") },
-                        isError = emailError.isNotEmpty(),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    if (emailError.isNotEmpty()) {
-                        Text(
-                            text = emailError,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                    profileEditHandler.updateProfile(updateProfileRequest)
+                }) {
+                    Text("Save Changes")
                 }
-
-                // Divider and button at the bottom
-                Column {
-                    Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), thickness = 1.dp)
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                            if (validateInput()) {
-                                showDialog = true
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Save Changes")
-                    }
-                }
-            }
-
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Confirm Changes") },
-                    text = { Text("Are you sure you want to save the changes?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showDialog = false
-                            navController.navigateUp()
-                        }) {
-                            Text("Confirm")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDialog = false }) {
-                            Text("Cancel")
-                        }
-                    }
-                )
             }
         }
 
-        com.air_wheelly.wheelly.presentation.components.BottomNavigation(
+        // Display error message if there is any
+        errorMessage?.let {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = it,
+                color = androidx.compose.ui.graphics.Color.Red,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+
+        // Spacer to push the BottomNavigation to the bottom
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Add Bottom Navigation
+        BottomNavigation(
             navController = navController,
             modifier = Modifier
                 .padding(start = 0.dp, end = 0.dp)
@@ -164,3 +115,4 @@ fun ProfileEditScreen(
         )
     }
 }
+
