@@ -41,4 +41,7 @@ object NetworkService {
     fun pastReservationsService(context: Context): PastReservationsService {
         return getRetrofitInstance(context).create(PastReservationsService::class.java)
     }
+    fun profileService(context: Context): EditProfileService{
+        return getRetrofitInstance(context).create(EditProfileService::class.java)
+    }
 }

@@ -13,7 +13,7 @@ import com.air_wheelly.wheelly.presentation.auth.LoginScreen
 import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
 import com.air_wheelly.wheelly.presentation.car_list.CarList
 import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
-import com.air_wheelly.wheelly.presentation.profile.ProfileEditScreen
+import com.air_wheelly.wheelly.presentation.profile.ProfileScreen
 import com.air_wheelly.wheelly.presentation.reservations.ReservationHistoryScreen
 import com.braintreepayments.api.DropInClient
 import com.google.gson.Gson
@@ -39,7 +39,7 @@ fun AppNavigator(
             RegisterScreen(navController)
         }
         composable(route = "profile") {
-            ProfileEditScreen(navController)
+            ProfileScreen(navController)
         }
         composable(route = "createListing"){
             user?.let {
