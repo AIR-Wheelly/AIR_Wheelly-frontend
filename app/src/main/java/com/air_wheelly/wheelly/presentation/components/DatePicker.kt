@@ -8,6 +8,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +42,7 @@ fun DatePicker(
         readOnly = true,
         trailingIcon = {
             IconButton(onClick = { datePickerDialog.show() }) {
-                Icon(Icons.Default.Add, contentDescription = null)
+                Icon(Icons.Default.DateRange, contentDescription = null)
             }
         },
         modifier = Modifier.fillMaxWidth()
