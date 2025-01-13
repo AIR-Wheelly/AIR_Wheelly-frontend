@@ -146,7 +146,6 @@ class CarViewModel(private val context: Context) : ViewModel() {
 
     fun createCarListing(newCarBody: NewCarBody, onSuccess: () -> Unit, onError: (String) -> Unit) {
         val handler = CreateCarRequestHandler(context, newCarBody)
-        println("Creating car listing $newCarBody")
         handler.sendRequest(object : ResponseListener<Unit> {
             override fun onSuccessfulResponse(response: SuccessfulResponseBody<Unit>) {
                 viewModelScope.launch {
@@ -168,9 +167,7 @@ class CarViewModel(private val context: Context) : ViewModel() {
         })
     }
 
-    // In CarViewModel.kt
     fun getCarDetails(carId: String, onCarDetailsFetched: (CarListResponse) -> Unit) {
-        // Assuming you have a request handler to fetch car details
         val handler = CarByIdRequestHandler(context, carId)
         handler.sendRequest(object : ResponseListener<CarListResponse> {
             override fun onSuccessfulResponse(response: SuccessfulResponseBody<CarListResponse>) {
