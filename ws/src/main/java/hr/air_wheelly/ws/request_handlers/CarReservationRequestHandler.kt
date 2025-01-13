@@ -9,7 +9,7 @@ import retrofit2.Call
 class CarReservationRequestHandler(private val context: Context, private val createNewReservationBody: CreateNewReservationBody) :
     TemplateRequestHandler<Unit>() {
 
-    override fun getServiceCall(): Call<SuccessfulResponseBody<Unit>> {
+    public override fun getServiceCall(): Call<SuccessfulResponseBody<Unit>> {
         val service = NetworkService.carService(context)
         return service.createRental(createNewReservationBody)
     }
