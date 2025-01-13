@@ -4,6 +4,7 @@ import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarModel
+import hr.air_wheelly.ws.models.responses.car.CreateNewReservationBody
 import hr.air_wheelly.ws.models.responses.car.NewCarBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -29,4 +30,8 @@ interface CarService {
 
     @GET("car/GetCarListingById/{id}")
     fun getCarListingById(@Path("id") carListingId: String): Call<SuccessfulResponseBody<CarListResponse>>
+
+    @POST("api/car/CreateRental")
+    fun createRental(@Body reservationBody: CreateNewReservationBody): Call<SuccessfulResponseBody<Unit>>
+
 }
