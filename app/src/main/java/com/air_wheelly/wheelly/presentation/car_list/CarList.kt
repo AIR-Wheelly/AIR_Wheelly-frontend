@@ -184,7 +184,9 @@ fun CarList(
                             Text("Error: $errorMessage", color = Color.Red)
                         } else {
                             filteredCarList.forEach { car ->
-                                CarCard(car)
+                                CarCard(car = car) {
+                                    navController.navigate("car_reservation/${car.id}")
+                                }
                             }
                         }
                     }

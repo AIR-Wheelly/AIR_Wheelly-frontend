@@ -2,6 +2,7 @@ package com.air_wheelly.wheelly.presentation.components
 
 import android.R
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -17,12 +18,13 @@ import androidx.compose.ui.unit.dp
 import hr.air_wheelly.core.network.CarListResponse
 
 @Composable
-fun CarCard(car: CarListResponse) {
+fun CarCard(car: CarListResponse, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
