@@ -7,7 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.model.ProfileEditHandler
+import com.air_wheelly.wheelly.domain.ProfileEditHandler
 import hr.air_wheelly.ws.models.UpdateProfileRequest
 import androidx.compose.ui.platform.LocalContext
 import com.air_wheelly.wheelly.presentation.components.BottomNavigation

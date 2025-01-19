@@ -1,4 +1,4 @@
-package com.air_wheelly.wheelly.domain.model
+package com.air_wheelly.wheelly.domain
 
 import android.content.Context
 import hr.air_wheelly.ws.models.responses.car.CreateNewReservationBody

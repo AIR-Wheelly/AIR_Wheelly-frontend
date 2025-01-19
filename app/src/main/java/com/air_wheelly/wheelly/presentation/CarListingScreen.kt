@@ -1,7 +1,7 @@
 package com.air_wheelly.wheelly.presentation
 
-import CarViewModel
-import CarViewModelFactory
+import com.air_wheelly.wheelly.domain.CarViewModel
+import com.air_wheelly.wheelly.domain.CarViewModelFactory
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts

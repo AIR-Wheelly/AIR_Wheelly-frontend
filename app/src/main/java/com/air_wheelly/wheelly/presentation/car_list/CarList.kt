@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.model.CarListHandler
+import com.air_wheelly.wheelly.domain.CarListHandler
 import com.air_wheelly.wheelly.presentation.components.CarCard
 import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.util.EnumFuelType
