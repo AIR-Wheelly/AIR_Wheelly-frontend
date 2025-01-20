@@ -13,8 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.PaymentViewModel
-import com.air_wheelly.wheelly.domain.PaymentViewModelFactory
+import com.air_wheelly.wheelly.domain.payment.PaymentViewModel
+import com.air_wheelly.wheelly.domain.payment.PaymentViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.Base64Image
 import com.air_wheelly.wheelly.presentation.components.ErrorDialog
 import com.air_wheelly.wheelly.util.LocalDateFormatter

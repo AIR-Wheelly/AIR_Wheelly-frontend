@@ -1,5 +1,6 @@
-package com.air_wheelly.wheelly.domain
+package com.air_wheelly.wheelly.domain.payment
 
+import com.air_wheelly.wheelly.domain.BaseState
 import hr.air_wheelly.core.network.CarListResponse
 
 data class PaymentState(

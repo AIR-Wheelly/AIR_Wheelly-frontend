@@ -16,10 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.CarListHandler
+import com.air_wheelly.wheelly.domain.car_list.CarListViewModel
+import com.air_wheelly.wheelly.domain.car_list.CarListViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.CarCard
-import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.util.EnumFuelType
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -28,39 +29,20 @@ import hr.air_wheelly.core.util.EnumFuelType
 fun CarList(
     navController: NavController
 ) {
-    var searchText by remember { mutableStateOf("") }
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var selectedFuelType by remember { mutableStateOf(EnumFuelType.values().toSet()) }
-    var selectedManufacturer by remember { mutableStateOf("") }
-    var selectedYear by remember { mutableStateOf<Int?>(null) }
+    val context = LocalContext.current
+    val viewModel: CarListViewModel = viewModel(factory = CarListViewModelFactory(context))
+    val state by viewModel.state.collectAsState()
 
     var tempSelectedFuelType by remember { mutableStateOf(EnumFuelType.values().toSet()) }
     var tempSelectedManufacturer by remember { mutableStateOf("") }
     var tempSelectedYear by remember { mutableStateOf<Int?>(null) }
 
-    val coroutineScope = rememberCoroutineScope()
-
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
     )
 
-    val context = LocalContext.current
-    val carListHandler = remember { CarListHandler(context) }
-    val carList by carListHandler.carList.collectAsState()
-    val errorMessage by carListHandler.errorMessage.collectAsState()
-
-    var filteredCarList by remember { mutableStateOf(listOf<CarListResponse>()) }
-
-    LaunchedEffect(carList, selectedFuelType, selectedManufacturer, selectedYear) {
-        filteredCarList = carList.filter { car ->
-            (selectedFuelType == null || selectedFuelType.contains(EnumFuelType.valueOf(car.fuelType!!.toUpperCase()))) &&
-                    (selectedManufacturer.isEmpty() || car.model?.manafacturerId?.contains(selectedManufacturer, ignoreCase = true) == true) &&
-                    (selectedYear == null || car.yearOfProduction == selectedYear)
-        }
-    }
-
     LaunchedEffect(Unit) {
-        carListHandler.fetchCarList()
+        viewModel.fetchCarList()
     }
 
     Column(
@@ -147,9 +129,7 @@ fun CarList(
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                selectedFuelType = tempSelectedFuelType
-                                selectedManufacturer = tempSelectedManufacturer
-                                selectedYear = tempSelectedYear
+                                viewModel.applyFilters(tempSelectedFuelType, tempSelectedManufacturer, tempSelectedYear)
                             }
                         ) {
                             Text("Apply Filters")
@@ -158,9 +138,7 @@ fun CarList(
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                selectedFuelType = EnumFuelType.values().toSet()
-                                selectedManufacturer = ""
-                                selectedYear = null
+                                viewModel.clearFilters()
                                 tempSelectedFuelType = EnumFuelType.values().toSet()
                                 tempSelectedManufacturer = ""
                                 tempSelectedYear = null
@@ -180,10 +158,10 @@ fun CarList(
                             .padding(bottom = 0.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        if (errorMessage != null) {
-                            Text("Error: $errorMessage", color = Color.Red)
+                        if (state.errorMessage != null) {
+                            Text("Error: ${state.errorMessage}", color = Color.Red)
                         } else {
-                            filteredCarList.forEach { car ->
+                            state.filteredCarList.forEach { car ->
                                 CarCard(car = car) {
                                     navController.navigate("car_reservation/${car.id}")
                                 }

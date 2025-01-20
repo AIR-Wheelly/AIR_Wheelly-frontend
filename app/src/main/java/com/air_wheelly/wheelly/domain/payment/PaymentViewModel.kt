@@ -1,4 +1,4 @@
-package com.air_wheelly.wheelly.domain
+package com.air_wheelly.wheelly.domain.payment
 
 import android.content.Context
 import android.util.Log

@@ -1,16 +1,16 @@
-package com.air_wheelly.wheelly.domain
+package com.air_wheelly.wheelly.domain.car_list
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class PaymentViewModelFactory(
+class CarListViewModelFactory(
     private val context: Context
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PaymentViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(CarListViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PaymentViewModel(context) as T
+            return CarListViewModel(context) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
