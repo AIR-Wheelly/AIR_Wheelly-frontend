@@ -2,32 +2,20 @@
 
 package com.air_wheelly.wheelly.presentation.auth
 
-import android.util.Patterns
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import hr.air_wheelly.core.login.ILoginConfig
-import hr.air_wheelly.core.login.LoginHandler
-import hr.air_wheelly.core.login.LoginOutcomeListener
-import hr.air_wheelly.core.login.LoginResponse
-import hr.air_wheelly.login_email_password.EmailPasswordLoginConfig
-import hr.air_wheelly.login_email_password.EmailPasswordLoginHandler
+import com.air_wheelly.wheelly.domain.login.LoginViewModel
+import com.air_wheelly.wheelly.domain.login.LoginViewModelFactory
 import hr.air_wheelly.login_google.GoogleLoginConfig
-import hr.air_wheelly.login_google.GoogleLoginHandler
-import hr.air_wheelly.ws.models.TokenManager
 import hr.air_wheelly.ws.models.responses.ProfileResponse
-import hr.air_wheelly.ws.request_handlers.ProfileRequestHandler
-import hr.air_wheelly.core.network.ResponseListener
-import hr.air_wheelly.core.network.models.ErrorResponseBody
-import hr.air_wheelly.core.network.models.SuccessfulResponseBody
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,97 +23,12 @@ fun LoginScreen(
     navController: NavController,
     onLoginSuccess: (ProfileResponse) -> Unit
 ) {
+    val context = LocalContext.current
+    val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context, onLoginSuccess))
+    val state by viewModel.state.collectAsState()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var emailError by remember { mutableStateOf("") }
-    var passwordError by remember { mutableStateOf("") }
-    var loading by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
-
-    val context = LocalView.current.context
-
-    fun performLogin(config: ILoginConfig) {
-        loading = true
-        val loginHandler: LoginHandler
-
-        when (config) {
-            is EmailPasswordLoginConfig -> {
-                loginHandler = EmailPasswordLoginHandler(context)
-            }
-
-            is GoogleLoginConfig -> {
-                loginHandler = GoogleLoginHandler()
-            }
-
-            else -> {
-                throw Exception("Unknown login config")
-            }
-        }
-
-        coroutineScope.launch {
-            loginHandler.handleLogin(config,
-                object : LoginOutcomeListener {
-                    override fun onSuccessfulLogin(loginResponse: LoginResponse) {
-                        loading = false
-                        TokenManager.saveToken(context, loginResponse.token)
-                        Toast.makeText(context, "Login successful! " + loginResponse.token, Toast.LENGTH_SHORT).show()
-                        val handler = ProfileRequestHandler(context)
-                        handler.sendRequest(object : ResponseListener<ProfileResponse> {
-                            override fun onSuccessfulResponse(response: SuccessfulResponseBody<ProfileResponse>) {
-                                onLoginSuccess(response.result)
-                            }
-
-                            override fun onErrorResponse(response: ErrorResponseBody) {
-                                Toast.makeText(context, "Error: ${response.error_message}", Toast.LENGTH_SHORT).show()
-                            }
-
-                            override fun onNetworkFailure(t: Throwable) {
-                                Toast.makeText(context, "Network failure", Toast.LENGTH_SHORT).show()
-                            }
-                        })
-                        navController.navigate("carList")
-                    }
-
-                    override fun onFailedLogin(message: String) {
-                        loading = false
-                        Toast.makeText(context, "Login failed: $message", Toast.LENGTH_SHORT).show()
-                    }
-                })
-        }
-    }
-
-    // Validate and initiate login
-    fun onLoginClicked() {
-        emailError = ""
-        passwordError = ""
-
-        if (email.isEmpty()) {
-            emailError = "Email cannot be empty"
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailError = "Invalid email format"
-        }
-
-        if (password.isEmpty()) {
-            passwordError = "Password cannot be empty"
-        }
-
-        if (emailError.isEmpty() && passwordError.isEmpty()) {
-            val emailPasswordLoginConfig = EmailPasswordLoginConfig(
-                email = email,
-                password = password
-            )
-
-            performLogin(emailPasswordLoginConfig)
-        }
-    }
-
-    fun googleLogin() {
-        val googleLoginConfig = GoogleLoginConfig(
-            context = context
-        )
-
-        performLogin(googleLoginConfig)
-    }
 
     // UI Layout
     Box(
@@ -145,12 +48,12 @@ fun LoginScreen(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                isError = emailError.isNotEmpty(),
+                isError = state.emailError != null,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (emailError.isNotEmpty()) {
+            if(state.emailError != null) {
                 Text(
-                    text = emailError,
+                    text = state.emailError ?: "",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth()
@@ -164,12 +67,12 @@ fun LoginScreen(
                 onValueChange = { password = it },
                 label = { Text("Password") },
                 visualTransformation = PasswordVisualTransformation(),
-                isError = passwordError.isNotEmpty(),
+                isError = state.passwordError != null,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (passwordError.isNotEmpty()) {
+            if (state.passwordError != null) {
                 Text(
-                    text = passwordError,
+                    text = state.passwordError ?: "",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth()
@@ -179,23 +82,26 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { onLoginClicked() },
+                onClick = { viewModel.validateInputs(email, password) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !loading
+                enabled = !state.isLoading
             ) {
                 Text("Login")
             }
 
             Button(
-                onClick = { googleLogin() },
+                onClick = {
+                    val googleLoginConfig = GoogleLoginConfig(context)
+                    viewModel.performLogin(googleLoginConfig)
+                },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !loading
+                enabled = !state.isLoading
             ) {
                 Text("Google Login")
             }
         }
 
-        if (loading) {
+        if (state.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
             )
