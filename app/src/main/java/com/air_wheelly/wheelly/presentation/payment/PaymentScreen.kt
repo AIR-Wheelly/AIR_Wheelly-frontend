@@ -30,8 +30,8 @@ fun PaymentScreen(
     onPurchaseInit: (String, Float) -> Unit
 ) {
     val context = LocalContext.current
-    val carViewModel: PaymentViewModel = viewModel(factory = PaymentViewModelFactory(context))
-    val state by carViewModel.state.collectAsState()
+    val viewModel: PaymentViewModel = viewModel(factory = PaymentViewModelFactory(context))
+    val state by viewModel.state.collectAsState()
     val dropInRequest = DropInRequest()
     val localDateFormatter = LocalDateFormatter()
 
@@ -40,34 +40,34 @@ fun PaymentScreen(
     }
 
     fun payForCarRent() {
-        carViewModel.launchPayment(dropInClient, dropInRequest)
+        viewModel.launchPayment(dropInClient, dropInRequest)
     }
 
     LaunchedEffect(reservation) {
         reservation?.carListingId?.let {
-            carViewModel.fetchCarDetails(it)
+            viewModel.fetchCarDetails(it)
         }
     }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (state.errorMessage != null) {
-            ErrorDialog(
-                errorMessage = state.errorMessage.toString(),
-                onDismiss = { carViewModel.clearError() }
-            )
-        } else {
-            Box(
-                modifier = Modifier.weight(1f)
-            ) {
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            if (state.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (state.errorMessage != null) {
+                ErrorDialog(
+                    errorMessage = state.errorMessage.toString(),
+                    onDismiss = { viewModel.clearError() }
+                )
+            } else {
                 Column {
 
                     state.carListingById?.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
