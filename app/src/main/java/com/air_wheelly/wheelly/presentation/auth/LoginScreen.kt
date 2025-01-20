@@ -30,7 +30,6 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // UI Layout
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
