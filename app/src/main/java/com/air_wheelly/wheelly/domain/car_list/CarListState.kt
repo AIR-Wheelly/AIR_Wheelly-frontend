@@ -13,12 +13,4 @@ data class CarListState(
     val selectedYear: Int? = null,
     override val isLoading: Boolean = false,
     override val errorMessage: String? = null
-) : BaseState(isLoading, errorMessage) {
-    fun filterCarList(): List<CarListResponse> {
-        return carList.filter { car ->
-            (selectedFuelType.isEmpty() || selectedFuelType.contains(EnumFuelType.valueOf(car.fuelType!!.uppercase()))) &&
-                    (selectedManufacturer.isEmpty() || car.model?.manafacturerId?.contains(selectedManufacturer, ignoreCase = true) == true) &&
-                    (selectedYear == null || car.yearOfProduction == selectedYear)
-        }
-    }
-}
+) : BaseState(isLoading, errorMessage)

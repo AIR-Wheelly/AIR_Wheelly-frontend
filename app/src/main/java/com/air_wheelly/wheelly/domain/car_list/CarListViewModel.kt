@@ -18,6 +18,7 @@ class CarListViewModel(
     private val context: Context
 ) : ViewModel() {
 
+    private val carListModel = CarListModel()
     private val _state = MutableStateFlow(CarListState())
     val state: StateFlow<CarListState> = _state
 
@@ -30,12 +31,15 @@ class CarListViewModel(
                 override fun onSuccessfulResponse(response: SuccessfulResponseBody<List<CarListResponse>>) {
                     _state.value = _state.value.copy(
                         carList = response.result,
-                        filteredCarList = _state.value.copy(
-                            carList = response.result
-                        ).filterCarList(),
+                        filteredCarList = carListModel.filterCars(
+                            response.result,
+                            _state.value.selectedFuelType,
+                            _state.value.selectedManufacturer,
+                            _state.value.selectedYear
+                        ),
                         isLoading = false
                     )
-                    Log.d("CARLISTasdf", response.result.toString())
+                    Log.d("CARLIST", response.result.toString())
                 }
 
                 override fun onErrorResponse(response: ErrorResponseBody) {
@@ -51,6 +55,7 @@ class CarListViewModel(
                         errorMessage = "Network failure, please try again later",
                         isLoading = false
                     )
+                    Log.d("CARlIST", t.cause.toString())
                 }
             })
         }
@@ -61,11 +66,12 @@ class CarListViewModel(
             selectedFuelType = fuelType,
             selectedManufacturer = manufacturer,
             selectedYear = year,
-            filteredCarList = _state.value.copy(
-                selectedFuelType = fuelType,
-                selectedManufacturer = manufacturer,
-                selectedYear = year
-            ).filterCarList()
+            filteredCarList = carListModel.filterCars(
+                _state.value.carList,
+                fuelType,
+                manufacturer,
+                year
+            )
         )
     }
 
@@ -74,11 +80,18 @@ class CarListViewModel(
             selectedFuelType = EnumFuelType.values().toSet(),
             selectedManufacturer = "",
             selectedYear = null,
-            filteredCarList = _state.value.copy(
-                selectedFuelType = EnumFuelType.values().toSet(),
-                selectedManufacturer = "",
-                selectedYear = null
-            ).filterCarList()
+            filteredCarList = carListModel.filterCars(
+                _state.value.carList,
+                EnumFuelType.values().toSet(),
+                "",
+                null
+            )
+        )
+    }
+
+    fun clearError() {
+        _state.value = _state.value.copy(
+            errorMessage = null
         )
     }
 }
