@@ -18,31 +18,37 @@ import kotlinx.coroutines.launch
 class PaymentViewModel(
     private val context: Context
 ) : ViewModel(){
-    private val _carListingByID = MutableStateFlow<CarListResponse?>(null)
-    val carListingByID: StateFlow<CarListResponse?> get() = _carListingByID
+    private val _state = MutableStateFlow(PaymentState())
+    val state: StateFlow<PaymentState> get() = _state
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
-
-    fun fetchCarDetails(carListingId: String) {
-        _isLoading.value = true
+    suspend fun fetchCarDetails(carListingId: String) {
+        _state.value = _state.value.copy(isLoading = true)
         val handler = CarByIdRequestHandler(context, carListingId)
 
         handler.sendRequest(
             object : ResponseListener<CarListResponse> {
                 override fun onSuccessfulResponse(response: SuccessfulResponseBody<CarListResponse>) {
-                    _carListingByID.value = response.result
-                    _isLoading.value = false
+                    _state.value = _state.value.copy(
+                        carListingById = response.result,
+                        isLoading = false,
+                        errorMessage = null
+                    )
                     Log.d("CARLISTID", response.result.toString())
                 }
 
                 override fun onErrorResponse(response: ErrorResponseBody) {
-                    _isLoading.value = false
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        errorMessage = response.error_message
+                    )
                     Log.d("CARLISTID", response.error_message)
                 }
 
                 override fun onNetworkFailure(t: Throwable) {
-                    _isLoading.value = false
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        errorMessage = "Network failure!"
+                    )
                     Log.d("CARLISTID", t.cause.toString())
                 }
             }
@@ -55,5 +61,9 @@ class PaymentViewModel(
         viewModelScope.launch {
             dropInClient.launchDropIn(dropInRequest)
         }
+    }
+
+    fun clearError() {
+        _state.value = _state.value.copy(errorMessage = null)
     }
 }

@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.PaymentViewModel
 import com.air_wheelly.wheelly.domain.PaymentViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.Base64Image
+import com.air_wheelly.wheelly.presentation.components.ErrorDialog
 import com.air_wheelly.wheelly.util.LocalDateFormatter
 import com.braintreepayments.api.DropInClient
 import com.braintreepayments.api.DropInRequest
@@ -30,8 +31,7 @@ fun PaymentScreen(
 ) {
     val context = LocalContext.current
     val carViewModel: PaymentViewModel = viewModel(factory = PaymentViewModelFactory(context))
-    val carListingById by carViewModel.carListingByID.collectAsState()
-    val isLoading by carViewModel.isLoading.collectAsState()
+    val state by carViewModel.state.collectAsState()
     val dropInRequest = DropInRequest()
     val localDateFormatter = LocalDateFormatter()
 
@@ -52,20 +52,25 @@ fun PaymentScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        if (isLoading) {
+        if (state.isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
+        } else if (state.errorMessage != null) {
+            ErrorDialog(
+                errorMessage = state.errorMessage.toString(),
+                onDismiss = { carViewModel.clearError() }
+            )
         } else {
             Box(
                 modifier = Modifier.weight(1f)
             ) {
                 Column {
 
-                    carListingById?.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
+                    state.carListingById?.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
                         Base64Image(
                             imageBase64, modifier = Modifier
                                 .align(alignment = Alignment.CenterHorizontally)
