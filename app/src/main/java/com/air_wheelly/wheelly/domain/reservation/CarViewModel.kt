@@ -1,4 +1,4 @@
-package com.air_wheelly.wheelly.domain
+package com.air_wheelly.wheelly.domain.reservation
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -27,17 +27,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
-class CarViewModel(private val context: Context) : ViewModel() {
-    private val _manufacturers = MutableStateFlow<List<AllManufacturers>>(emptyList())
-    val manufacturers: StateFlow<List<AllManufacturers>> = _manufacturers
+class CarViewModel(
+    private val context: Context
+) : ViewModel() {
+    private val _state = MutableStateFlow(CarState())
+    val state: StateFlow<CarState> = _state
 
-    private val _models = MutableStateFlow<List<CarModel>>(emptyList())
-    val models: StateFlow<List<CarModel>> = _models
-
-    private val _fuelTypes = MutableStateFlow<List<String>>(emptyList())
-    val fuelTypes: StateFlow<List<String>> = _fuelTypes
-
-    private val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    private val fusedLocationClient: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context)
 
     init {
         fetchManufacturers()
@@ -45,65 +42,96 @@ class CarViewModel(private val context: Context) : ViewModel() {
     }
 
     private fun fetchManufacturers() {
-        val handler = ManufacturerRequestHandler(context)
-        handler.sendRequest(object : ResponseListener<Array<AllManufacturers>> {
-            override fun onSuccessfulResponse(response: SuccessfulResponseBody<Array<AllManufacturers>>) {
-                viewModelScope.launch {
-                    _manufacturers.value = response.result.toList()
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            val handler = ManufacturerRequestHandler(context)
+            handler.sendRequest(object : ResponseListener<Array<AllManufacturers>> {
+                override fun onSuccessfulResponse(response: SuccessfulResponseBody<Array<AllManufacturers>>) {
+                    _state.value = _state.value.copy(
+                        manufacturers = response.result.toList(),
+                        isLoading = false
+                    )
                 }
-            }
 
-            override fun onErrorResponse(response: ErrorResponseBody) {
-                logError(response.error_message)
-            }
+                override fun onErrorResponse(response: ErrorResponseBody) {
+                    logError(response.error_message)
+                }
 
-            override fun onNetworkFailure(t: Throwable) {
-                logError("Network failure")
-            }
-        })
+                override fun onNetworkFailure(t: Throwable) {
+                    logError("Network failure")
+                }
+            })
+        }
     }
 
     fun fetchModels(manufacturerId: String) {
-        val handler = ModelRequestHandler(context, manufacturerId)
-        handler.sendRequest(object : ResponseListener<Array<CarModel>> {
-            override fun onSuccessfulResponse(response: SuccessfulResponseBody<Array<CarModel>>) {
-                viewModelScope.launch {
-                    _models.value = response.result.toList()
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+            val handler = ModelRequestHandler(context, manufacturerId)
+            handler.sendRequest(object : ResponseListener<Array<CarModel>> {
+                override fun onSuccessfulResponse(response: SuccessfulResponseBody<Array<CarModel>>) {
+                    _state.value = _state.value.copy(
+                        models = response.result.toList(),
+                        isLoading = false
+                    )
                 }
-            }
 
-            override fun onErrorResponse(response: ErrorResponseBody) {
-                logError(response.error_message)
-            }
+                override fun onErrorResponse(response: ErrorResponseBody) {
+                    _state.value = _state.value.copy(
+                        errorMessage = "Error while fetching car",
+                        isLoading = false
+                    )
+                    logError("Network failure")
+                }
 
-            override fun onNetworkFailure(t: Throwable) {
-                logError("Network failure")
-            }
-        })
+                override fun onNetworkFailure(t: Throwable) {
+                    _state.value = _state.value.copy(
+                        errorMessage = "Network error, please try again later",
+                        isLoading = false
+                    )
+                    logError("Network failure")
+                }
+            })
+        }
     }
 
     private fun fetchFuelTypes() {
-        val handler = FuelTypeRequestHandler(context)
-        handler.sendRequest(object : ResponseListener<Array<String>> {
-            override fun onSuccessfulResponse(response: SuccessfulResponseBody<Array<String>>) {
-                viewModelScope.launch {
-                    _fuelTypes.value = response.result.toList()
+        viewModelScope.launch {
+            val handler = FuelTypeRequestHandler(context)
+            handler.sendRequest(object : ResponseListener<Array<String>> {
+                override fun onSuccessfulResponse(response: SuccessfulResponseBody<Array<String>>) {
+                    _state.value = _state.value.copy(
+                        fuelTypes = response.result.toList(),
+                        isLoading = false
+                    )
                 }
-            }
 
-            override fun onErrorResponse(response: ErrorResponseBody) {
-                logError(response.error_message)
-            }
+                override fun onErrorResponse(response: ErrorResponseBody) {
+                    _state.value = _state.value.copy(
+                        errorMessage = "Error while fetching car",
+                        isLoading = false
+                    )
+                    logError(response.error_message)
+                }
 
-            override fun onNetworkFailure(t: Throwable) {
-                logError("Network failure")
-            }
-        })
+                override fun onNetworkFailure(t: Throwable) {
+                    _state.value = _state.value.copy(
+                        errorMessage = "Network error, please try again later",
+                        isLoading = false
+                    )
+                    logError("Network failure")
+                }
+            })
+        }
     }
 
     @SuppressLint("MissingPermission")
     fun getCurrentLocation(onLocationReceived: (Location) -> Unit, onError: (String) -> Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
                     onLocationReceived(it)
@@ -132,15 +160,23 @@ class CarViewModel(private val context: Context) : ViewModel() {
         val handler = CarLocationRequestHandler(context, carLocationBody)
         handler.sendRequest(object : ResponseListener<CarLocationResponse> {
             override fun onSuccessfulResponse(response: SuccessfulResponseBody<CarLocationResponse>) {
-                println("TESTING"+response.result)
+                println("TESTING" + response.result)
                 onLocationIdReceived(response.result.locationId)
             }
 
             override fun onErrorResponse(response: ErrorResponseBody) {
+                _state.value = _state.value.copy(
+                    errorMessage = response.error_message,
+                    isLoading = false
+                )
                 logError(response.error_message)
             }
 
             override fun onNetworkFailure(t: Throwable) {
+                _state.value = _state.value.copy(
+                    errorMessage = "Network failure, please try again later",
+                    isLoading = false
+                )
                 logError("Network failure")
             }
         })

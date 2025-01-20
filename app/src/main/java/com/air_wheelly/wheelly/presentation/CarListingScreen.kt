@@ -1,7 +1,5 @@
 package com.air_wheelly.wheelly.presentation
 
-import com.air_wheelly.wheelly.domain.CarViewModel
-import com.air_wheelly.wheelly.domain.CarViewModelFactory
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +17,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.air_wheelly.wheelly.domain.reservation.CarViewModel
+import com.air_wheelly.wheelly.domain.reservation.CarViewModelFactory
 import hr.air_wheelly.ws.models.responses.ProfileResponse
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarModel
@@ -32,10 +32,7 @@ fun CarListingScreen(
 ) {
     val context = LocalContext.current
     val carViewModel: CarViewModel = viewModel(factory = CarViewModelFactory(context))
-
-    val manufacturers by carViewModel.manufacturers.collectAsState()
-    val models by carViewModel.models.collectAsState()
-    val fuelTypes by carViewModel.fuelTypes.collectAsState()
+    val state by carViewModel.state.collectAsState()
 
     var selectedManufacturer by remember { mutableStateOf<AllManufacturers?>(null) }
     var selectedModel by remember { mutableStateOf<CarModel?>(null) }
@@ -106,7 +103,7 @@ fun CarListingScreen(
                         expanded = expandedManufacturer,
                         onDismissRequest = { expandedManufacturer = false }
                     ) {
-                        manufacturers.forEach { manufacturer ->
+                        state.manufacturers.forEach { manufacturer ->
                             DropdownMenuItem(
                                 text = { Text(text = manufacturer.name) },
                                 onClick = {
@@ -138,7 +135,7 @@ fun CarListingScreen(
                         expanded = expandedModel,
                         onDismissRequest = { expandedModel = false }
                     ) {
-                        models.forEach { model ->
+                        state.models.forEach { model ->
                             DropdownMenuItem(
                                 text = { Text(text = model.name) },
                                 onClick = {
@@ -169,7 +166,7 @@ fun CarListingScreen(
                         expanded = expandedFuelType,
                         onDismissRequest = { expandedFuelType = false }
                     ) {
-                        fuelTypes.forEach { fuelType ->
+                        state.fuelTypes.forEach { fuelType ->
                             DropdownMenuItem(
                                 text = { Text(text = fuelType) },
                                 onClick = {
