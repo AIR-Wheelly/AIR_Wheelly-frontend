@@ -4,11 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.network.ResponseListener
 import hr.air_wheelly.core.network.models.ErrorResponseBody
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.core.util.EnumFuelType
+import hr.air_wheelly.ws.models.responses.CarListResponse
 import hr.air_wheelly.ws.request_handlers.CarListRequestHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

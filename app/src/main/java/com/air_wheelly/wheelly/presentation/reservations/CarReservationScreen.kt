@@ -23,7 +23,7 @@ import com.air_wheelly.wheelly.domain.reservation.CarViewModel
 import com.air_wheelly.wheelly.domain.reservation.CarViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.Base64Image
 import com.air_wheelly.wheelly.presentation.components.DatePicker
-import hr.air_wheelly.core.network.CarListResponse
+import hr.air_wheelly.ws.models.responses.CarListResponse
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 

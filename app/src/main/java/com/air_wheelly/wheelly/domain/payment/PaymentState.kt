@@ -1,7 +1,7 @@
 package com.air_wheelly.wheelly.domain.payment
 
 import com.air_wheelly.wheelly.domain.BaseState
-import hr.air_wheelly.core.network.CarListResponse
+import hr.air_wheelly.ws.models.responses.CarListResponse
 
 data class PaymentState(
     val carListingById: CarListResponse? = null,

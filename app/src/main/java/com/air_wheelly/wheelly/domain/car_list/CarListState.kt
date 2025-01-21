@@ -1,8 +1,8 @@
 package com.air_wheelly.wheelly.domain.car_list
 
 import com.air_wheelly.wheelly.domain.BaseState
-import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.util.EnumFuelType
+import hr.air_wheelly.ws.models.responses.CarListResponse
 
 data class CarListState(
     val carList: List<CarListResponse> = emptyList(),
