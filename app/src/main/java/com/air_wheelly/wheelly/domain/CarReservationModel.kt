@@ -1,10 +1,8 @@
-package com.air_wheelly.wheelly.domain.model
+package com.air_wheelly.wheelly.domain
 
 import android.content.Context
 import hr.air_wheelly.ws.models.responses.car.CreateNewReservationBody
 import hr.air_wheelly.ws.request_handlers.CarReservationRequestHandler
-import hr.air_wheelly.core.network.models.SuccessfulResponseBody
-import hr.air_wheelly.core.network.models.ErrorResponseBody
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate

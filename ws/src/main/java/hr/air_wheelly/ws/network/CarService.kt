@@ -1,7 +1,7 @@
 package hr.air_wheelly.ws.network
 
-import hr.air_wheelly.core.network.CarListResponse
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
+import hr.air_wheelly.ws.models.responses.CarListResponse
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarModel
 import hr.air_wheelly.ws.models.responses.car.CreateNewReservationBody

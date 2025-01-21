@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import hr.air_wheelly.core.network.CarListResponse
+import hr.air_wheelly.ws.models.responses.CarListResponse
 
 @Composable
 fun CarCard(car: CarListResponse, onClick: () -> Unit) {

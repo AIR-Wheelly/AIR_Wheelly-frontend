@@ -1,8 +1,5 @@
 package com.air_wheelly.wheelly.presentation.reservations
 
-import CarViewModel
-import CarViewModelFactory
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -10,7 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,10 +18,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.model.CarReservationModel
+import com.air_wheelly.wheelly.domain.CarReservationModel
+import com.air_wheelly.wheelly.domain.reservation.CarViewModel
+import com.air_wheelly.wheelly.domain.reservation.CarViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.Base64Image
 import com.air_wheelly.wheelly.presentation.components.DatePicker
-import hr.air_wheelly.core.network.CarListResponse
+import hr.air_wheelly.ws.models.responses.CarListResponse
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 

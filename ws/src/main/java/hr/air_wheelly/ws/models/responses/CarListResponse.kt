@@ -1,4 +1,4 @@
-package hr.air_wheelly.core.network
+package hr.air_wheelly.ws.models.responses
 
 import hr.air_wheelly.core.util.CarLocation
 
@@ -25,10 +25,4 @@ data class CarListingPicture(
     val id: String,
     val carListingId: String,
     val image: String
-)
-
-data class CarModel(
-    val id: String?,
-    val manafacturerId: String?,
-    val name: String?
 )
