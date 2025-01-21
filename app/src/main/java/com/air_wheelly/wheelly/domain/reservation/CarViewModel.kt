@@ -189,18 +189,21 @@ class CarViewModel(
                 viewModelScope.launch {
                     onSuccess()
                 }
+                Log.d("CREATECARLISTING", "Success creating car listing")
             }
 
             override fun onErrorResponse(response: ErrorResponseBody) {
                 viewModelScope.launch {
                     onError(response.error_message)
                 }
+                Log.d("CREATECARLISTING", "OnErrorResponse ${response.error_message}")
             }
 
             override fun onNetworkFailure(t: Throwable) {
                 viewModelScope.launch {
                     onError("Network failure")
                 }
+                Log.d("CREATECARLISTING", t.cause.toString())
             }
         })
     }
