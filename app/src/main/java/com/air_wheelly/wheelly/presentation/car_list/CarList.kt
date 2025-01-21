@@ -2,7 +2,9 @@ package com.air_wheelly.wheelly.presentation.car_list
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -174,6 +176,7 @@ fun CarList(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
                                 .padding(bottom = 0.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
