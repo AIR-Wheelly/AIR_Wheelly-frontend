@@ -1,12 +1,13 @@
 package com.air_wheelly.wheelly.domain.reservation
 
 import com.air_wheelly.wheelly.domain.BaseState
-import hr.air_wheelly.ws.models.responses.car.CarModel
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
+import hr.air_wheelly.ws.models.responses.car.CarModel
 
 data class CarState(
     override val isLoading: Boolean = false,
     override val errorMessage: String? = null,
+    val successMessage: String? = null,
     val manufacturers: List<AllManufacturers> = emptyList(),
     val models: List<CarModel> = emptyList(),
     val fuelTypes: List<String> = emptyList(),

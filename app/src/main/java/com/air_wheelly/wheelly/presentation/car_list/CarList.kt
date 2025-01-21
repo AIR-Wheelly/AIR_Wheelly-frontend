@@ -22,8 +22,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.car_list.CarListViewModel
 import com.air_wheelly.wheelly.domain.car_list.CarListViewModelFactory
+import com.air_wheelly.wheelly.presentation.components.AlertDialog
 import com.air_wheelly.wheelly.presentation.components.CarCard
-import com.air_wheelly.wheelly.presentation.components.ErrorDialog
 import hr.air_wheelly.core.util.EnumFuelType
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -64,8 +64,9 @@ fun CarList(
                     androidx.compose.material3.CircularProgressIndicator()
                 }
             } else if (state.errorMessage != null) {
-                ErrorDialog(
-                    errorMessage = state.errorMessage.toString(),
+                AlertDialog(
+                    title = "Error",
+                    message = state.errorMessage.toString(),
                     onDismiss = { viewModel.clearError() }
                 )
             } else {

@@ -63,7 +63,9 @@ class PaymentViewModel(
         }
     }
 
-    fun clearError() {
-        _state.value = _state.value.copy(errorMessage = null)
+    fun clearMessages() {
+        _state.value = _state.value.copy(
+            errorMessage = null
+        )
     }
 }

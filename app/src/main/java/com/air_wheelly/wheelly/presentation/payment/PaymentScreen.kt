@@ -16,7 +16,6 @@ import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.payment.PaymentViewModel
 import com.air_wheelly.wheelly.domain.payment.PaymentViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.Base64Image
-import com.air_wheelly.wheelly.presentation.components.ErrorDialog
 import com.air_wheelly.wheelly.util.LocalDateFormatter
 import com.braintreepayments.api.DropInClient
 import com.braintreepayments.api.DropInRequest
@@ -63,9 +62,10 @@ fun PaymentScreen(
                     CircularProgressIndicator()
                 }
             } else if (state.errorMessage != null) {
-                ErrorDialog(
-                    errorMessage = state.errorMessage.toString(),
-                    onDismiss = { viewModel.clearError() }
+                com.air_wheelly.wheelly.presentation.components.AlertDialog(
+                    title = "Error",
+                    message = state.errorMessage.toString(),
+                    onDismiss = { viewModel.clearMessages() }
                 )
             } else {
                 Column {

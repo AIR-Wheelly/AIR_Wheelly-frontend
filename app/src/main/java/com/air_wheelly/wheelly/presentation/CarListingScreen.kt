@@ -19,7 +19,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.reservation.CarViewModel
 import com.air_wheelly.wheelly.domain.reservation.CarViewModelFactory
-import com.air_wheelly.wheelly.presentation.components.ErrorDialog
 import hr.air_wheelly.ws.models.responses.ProfileResponse
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarModel
@@ -84,13 +83,15 @@ fun CarListingScreen(
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 if (successMessage != null) {
-                    ErrorDialog(
-                        errorMessage = successMessage.toString(),
+                    com.air_wheelly.wheelly.presentation.components.AlertDialog(
+                        title = "Success",
+                        message = successMessage.toString(),
                         { clearMessages() }
                     )
                 } else if (errorMessage != null) {
-                    ErrorDialog(
-                        errorMessage = successMessage.toString(),
+                    com.air_wheelly.wheelly.presentation.components.AlertDialog(
+                        title = "Error",
+                        message = successMessage.toString(),
                         { clearMessages() }
                     )
                 } else {

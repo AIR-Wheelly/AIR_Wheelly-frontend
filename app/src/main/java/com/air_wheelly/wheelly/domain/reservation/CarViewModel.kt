@@ -187,6 +187,9 @@ class CarViewModel(
         handler.sendRequest(object : ResponseListener<Unit> {
             override fun onSuccessfulResponse(response: SuccessfulResponseBody<Unit>) {
                 viewModelScope.launch {
+                    _state.value = _state.value.copy(
+                        successMessage = "Car was Successfully listed"
+                    )
                     onSuccess()
                 }
                 Log.d("CREATECARLISTING", "Success creating car listing")
@@ -194,6 +197,9 @@ class CarViewModel(
 
             override fun onErrorResponse(response: ErrorResponseBody) {
                 viewModelScope.launch {
+                    _state.value = _state.value.copy(
+                        errorMessage = "Error, please try again later"
+                    )
                     onError(response.error_message)
                 }
                 Log.d("CREATECARLISTING", "OnErrorResponse ${response.error_message}")
@@ -201,6 +207,9 @@ class CarViewModel(
 
             override fun onNetworkFailure(t: Throwable) {
                 viewModelScope.launch {
+                    _state.value = _state.value.copy(
+                        errorMessage = "Network failure, please try again later"
+                    )
                     onError("Network failure")
                 }
                 Log.d("CREATECARLISTING", t.cause.toString())
