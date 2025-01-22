@@ -44,4 +44,8 @@ object NetworkService {
     fun profileService(context: Context): EditProfileService{
         return getRetrofitInstance(context).create(EditProfileService::class.java)
     }
+
+    fun statisticsService(context: Context): StatisticsService {
+        return getRetrofitInstance(context).create(StatisticsService::class.java)
+    }
 }
