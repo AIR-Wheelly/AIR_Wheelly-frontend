@@ -6,7 +6,7 @@ import hr.air_wheelly.ws.models.responses.statistics.LastMonthResponse
 import hr.air_wheelly.ws.network.NetworkService
 import retrofit2.Call
 
-class StatisticsLastMonthHandler(
+class StatisticsLastMonthRequestHandler(
     private val context: Context
 ) : TemplateRequestHandler<LastMonthResponse>() {
 

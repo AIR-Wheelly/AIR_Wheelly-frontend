@@ -6,7 +6,7 @@ import hr.air_wheelly.ws.models.responses.statistics.NumberOfRentsPerCarResponse
 import hr.air_wheelly.ws.network.NetworkService
 import retrofit2.Call
 
-class StatisticsGetRentsPerCarHandler(
+class StatisticsGetRentsPerCarRequestHandler(
     private val context: Context
 ) : TemplateRequestHandler<List<NumberOfRentsPerCarResponse>>() {
 
