@@ -16,6 +16,7 @@ import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
 import com.air_wheelly.wheelly.presentation.profile.ProfileScreen
 import com.air_wheelly.wheelly.presentation.reservations.CarReservationScreen
 import com.air_wheelly.wheelly.presentation.reservations.ReservationHistoryScreen
+import com.air_wheelly.wheelly.presentation.statistics.PerCarStatisticsScreen
 import com.air_wheelly.wheelly.presentation.statistics.StatisticsScreen
 import com.braintreepayments.api.DropInClient
 import com.google.gson.Gson
@@ -75,6 +76,9 @@ fun AppNavigator(
         }
         composable(route = "statistics") {
             StatisticsScreen(navController)
+        }
+        composable(route = "statPerCar") {
+            PerCarStatisticsScreen(navController)
         }
     }
 }
