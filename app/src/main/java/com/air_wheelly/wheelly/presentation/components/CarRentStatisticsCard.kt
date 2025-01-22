@@ -18,7 +18,7 @@ fun CarRentStatisticsCard(numberOfRentsPerCar: NumberOfRentsPerCarResponse) {
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(16.dp),
+            .padding(0.dp),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {

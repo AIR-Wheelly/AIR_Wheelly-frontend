@@ -1,54 +1,30 @@
 package com.air_wheelly.wheelly.presentation.statistics
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Surface
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.statistics.StatisticsViewModel
-import com.air_wheelly.wheelly.domain.statistics.StatisticsViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.CarRentStatisticsCard
+import hr.air_wheelly.ws.models.responses.statistics.NumberOfRentsPerCarResponse
 
 @Composable
 fun PerCarStatisticsScreen(
-    navController: NavController
+    numberOfRentsPerCar: List<NumberOfRentsPerCarResponse>
 ) {
-    val context = LocalContext.current
-    val viewModel: StatisticsViewModel = viewModel(factory = StatisticsViewModelFactory(context))
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchNumberOfListingsPerCar()
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(0.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 16.dp, end = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    state.numberOfRentsPerCar.forEach { rentsPerCar ->
-                        CarRentStatisticsCard(rentsPerCar)
-                    }
-                }
-            }
+        numberOfRentsPerCar.forEach { rentsPerCar ->
+            CarRentStatisticsCard(rentsPerCar)
         }
     }
 }

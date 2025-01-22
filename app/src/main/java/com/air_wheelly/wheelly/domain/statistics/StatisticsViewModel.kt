@@ -20,6 +20,7 @@ class StatisticsViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(StatisticsState())
     val state: StateFlow<StatisticsState> = _state
+    val tabOptions = listOf("Per Car", "Last Month")
 
     fun fetchNumberOfListingsPerCar() {
         val handler = StatisticsGetRentsPerCarRequestHandler(context)
@@ -103,5 +104,20 @@ class StatisticsViewModel(
         _state.value = _state.value.copy(
             errorMessage = null
         )
+    }
+
+    fun selectTab(index: Int) {
+        _state.value = _state.value.copy(
+            selectedTabIndex = index
+        )
+        fetchTabData(index)
+    }
+
+    fun fetchTabData(index: Int) {
+        if (state.value.numberOfRentsPerCar.isEmpty() && index == 0) {
+            fetchNumberOfListingsPerCar()
+        } else if (state.value.lastMonth == null && index == 1) {
+            fetchLastMonth()
+        }
     }
 }

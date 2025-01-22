@@ -5,6 +5,7 @@ import hr.air_wheelly.ws.models.responses.statistics.LastMonthResponse
 import hr.air_wheelly.ws.models.responses.statistics.NumberOfRentsPerCarResponse
 
 data class StatisticsState(
+    val selectedTabIndex: Int = 0,
     val lastMonth: LastMonthResponse? = null,
     val numberOfRentsPerCar: List<NumberOfRentsPerCarResponse> = emptyList(),
     override val isLoading: Boolean = false,
