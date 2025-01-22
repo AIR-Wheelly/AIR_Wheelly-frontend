@@ -98,4 +98,10 @@ class StatisticsViewModel(
             )
         }
     }
+
+    fun clearMessages() {
+        _state.value = _state.value.copy(
+            errorMessage = null
+        )
+    }
 }
