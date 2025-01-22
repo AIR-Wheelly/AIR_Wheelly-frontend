@@ -16,7 +16,7 @@ data class CarListResponse(
     val description: String?,
     val isActive: Boolean,
     val userId: String?,
-    val user: String?,
+    val user: ProfileResponse?,
     val model: CarModel?,
     val carListingPictures: List<CarListingPicture>
 )
