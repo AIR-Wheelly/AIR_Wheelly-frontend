@@ -10,16 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.air_wheelly.wheelly.util.LocalDateFormatter
 import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
+import androidx.compose.foundation.gestures.detectTapGestures
 
 @Composable
 fun ReservationCard(
     reservation: PastReservationsResponse,
-    onClick: (PastReservationsResponse) -> Unit
+    onClick: (PastReservationsResponse) -> Unit,
+    onLongClick: (PastReservationsResponse) -> Unit
 ) {
-
     val localDateFormatter = LocalDateFormatter()
 
     Card(
@@ -27,7 +29,12 @@ fun ReservationCard(
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(top = 4.dp)
-            .clickable { onClick(reservation) },
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onLongClick(reservation) },
+                    onTap = { onClick(reservation) }
+                )
+            },
         colors = CardDefaults.cardColors(
             if (reservation.isPaid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
         ),

@@ -62,10 +62,16 @@ fun ReservationHistoryScreen(
                 ) {
                     val gson = Gson()
                     pastReservations?.forEach { reservation ->
-                        ReservationCard(reservation = reservation) { clickedReservation ->
-                            val reservationJson = gson.toJson(clickedReservation)
-                            navController.navigate("paymentScreen/$reservationJson")
-                        }
+                        ReservationCard(
+                            reservation = reservation,
+                            onClick = { clickedReservation ->
+                                val reservationJson = gson.toJson(clickedReservation)
+                                navController.navigate("paymentScreen/$reservationJson")
+                            },
+                            onLongClick = { longClickedReservation ->
+                                navController.navigate("chatScreen/${longClickedReservation.id}")
+                            }
+                        )
                     }
                 }
             }
