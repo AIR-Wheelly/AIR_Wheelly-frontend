@@ -4,16 +4,18 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.air_wheelly.wheelly.domain.model.ProfileEditHandler
-import hr.air_wheelly.ws.models.UpdateProfileRequest
-import androidx.compose.ui.platform.LocalContext
-import com.air_wheelly.wheelly.presentation.components.BottomNavigation
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.air_wheelly.wheelly.domain.profile.ProfileEditViewModel
+import com.air_wheelly.wheelly.domain.profile.ProfileEditViewModelFactory
+import com.air_wheelly.wheelly.presentation.components.BottomNavigation
+import hr.air_wheelly.ws.models.UpdateProfileRequest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,12 +23,13 @@ fun ProfileScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
-    val profileEditHandler = remember { ProfileEditHandler(context) }
-    val userProfile by profileEditHandler.userProfile.collectAsState()
-    var firstName by remember { mutableStateOf(userProfile?.firstName ?: "") }
-    var lastName by remember { mutableStateOf(userProfile?.lastName ?: "") }
-    var currentPassword by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf("") }
+    val viewModel: ProfileEditViewModel = viewModel(factory = ProfileEditViewModelFactory(context))
+    val state by viewModel.state.collectAsState()
+
+    var firstName by remember { mutableStateOf(state.firstName) }
+    var lastName by remember { mutableStateOf(state.lastName) }
+    var currentPassword by remember { mutableStateOf(state.currentPassword) }
+    var newPassword by remember { mutableStateOf(state.newPassword) }
     var showDialog by remember { mutableStateOf(false) }
 
     Box(
@@ -48,7 +51,7 @@ fun ProfileScreen(
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
 
-            userProfile?.let {
+            state.userProfile?.let {
                 Text(
                     text = "First Name: ${it.firstName}",
                     style = MaterialTheme.typography.bodyMedium,
@@ -142,7 +145,7 @@ fun ProfileScreen(
                             val updateProfileRequest = UpdateProfileRequest(
                                 firstName, lastName, "", currentPassword, newPassword
                             )
-                            profileEditHandler.updateProfile(updateProfileRequest)
+                            viewModel.updateProfile(updateProfileRequest)
                             showDialog = false
                             Toast.makeText(context, "Update successful! ",Toast.LENGTH_SHORT).show()
                             navController.navigate("carList")

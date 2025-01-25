@@ -5,4 +5,5 @@
     <string name="chat">Chat</string>
     <string name="history">History</string>
     <string name="addCar">Add Car</string>
+    <string name="statistics">Stats</string>
 </resources>

@@ -1,12 +1,16 @@
+package com.air_wheelly.wheelly.domain.statistics
+
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class CarViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+class StatisticsViewModelFactory(
+    private val context: Context
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CarViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(StatisticsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CarViewModel(context) as T
+            return StatisticsViewModel(context) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

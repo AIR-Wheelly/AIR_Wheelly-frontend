@@ -8,4 +8,5 @@ sealed class NavigationItem(val route: String, val icon: Int, val title: Int) {
     object Chat : NavigationItem("chat", R.drawable.baseline_chat_24, R.string.chat)
     object History : NavigationItem("history", R.drawable.baseline_history_24, R.string.history)
     object AddForRent : NavigationItem("createListing", R.drawable.baseline_add_box_24, R.string.addCar)
+    object Statistics : NavigationItem("statistics", R.drawable.baseline_auto_graph_24, R.string.statistics)
 }

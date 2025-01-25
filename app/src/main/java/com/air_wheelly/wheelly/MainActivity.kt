@@ -34,6 +34,8 @@ class MainActivity : FragmentActivity(), DropInListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val context = this
+
         val tokenizationKey = "sandbox_w3fdp93n_tmcvwzknv5w6689h"
         val dropInClient = DropInClient(this, tokenizationKey)
         dropInClient.setListener(this)
@@ -54,20 +56,21 @@ class MainActivity : FragmentActivity(), DropInListener {
             handler.sendRequest(
                 object : ResponseListener<CreatePurchaseResponse> {
                     override fun onSuccessfulResponse(response: SuccessfulResponseBody<CreatePurchaseResponse>) {
-                        Log.d("PAYMENT", "Payment was successfull")
+                        Log.d("PAYMENT", "Payment was successful")
+                        Toast.makeText(context, "Payment Successful", Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onErrorResponse(response: ErrorResponseBody) {
                         Log.d("PAYMENT", "Payment NOT successful")
+                        Toast.makeText(context, "Error, not paid", Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onNetworkFailure(t: Throwable) {
                         Log.d("ERROR", t.cause.toString())
+                        Toast.makeText(context, "Network Error", Toast.LENGTH_SHORT).show()
                     }
                 }
             )
-
-            Toast.makeText(this, "Payment Successful", Toast.LENGTH_SHORT).show()
         }
 
         setContent {
