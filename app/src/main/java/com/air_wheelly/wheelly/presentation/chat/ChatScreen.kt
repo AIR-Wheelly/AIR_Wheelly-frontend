@@ -25,7 +25,7 @@ import com.air_wheelly.wheelly.presentation.components.ChatBubble
 @Composable
 fun ChatScreen(reservationId: String, currentUserId: String) {
     val context = LocalContext.current
-    val viewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(context, reservationId))
+    val viewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(context, reservationId, currentUserId))
     val chatMessages by viewModel.chatMessages.collectAsState()
     var message by remember { mutableStateOf(TextFieldValue("")) }
 
