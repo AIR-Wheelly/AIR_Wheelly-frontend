@@ -2,6 +2,7 @@ package com.air_wheelly.wheelly.presentation.chat
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,7 +35,7 @@ fun ChatScreen(reservationId: String, currentUserId: String) {
 
     LaunchedEffect(chatMessages) {
         if (chatMessages.isNotEmpty()) {
-            listState.scrollToItem(chatMessages.size - 1)
+            listState.scrollToItem(0)
         }
     }
 
@@ -50,7 +52,7 @@ fun ChatScreen(reservationId: String, currentUserId: String) {
                 .padding(bottom = 8.dp),
             reverseLayout = true
         ) {
-            items(chatMessages) { chatMessage ->
+            items(chatMessages.reversed()) { chatMessage ->
                 ChatBubble(
                     chatMessage = chatMessage,
                     isCurrentUser = chatMessage.senderId == currentUserId
@@ -61,7 +63,8 @@ fun ChatScreen(reservationId: String, currentUserId: String) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
             BasicTextField(
                 value = message,
@@ -95,15 +98,24 @@ fun ChatScreen(reservationId: String, currentUserId: String) {
                     }
                 }
             )
-            Button(
-                onClick = {
-                    if (message.text.isNotBlank()) {
-                        viewModel.sendMessage(message.text)
-                        message = TextFieldValue("")
-                    }
-                }
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(color = Color(0xFF4CAF50), shape = androidx.compose.foundation.shape.CircleShape)
+                    .padding(8.dp)
+                    .clickable {
+                        if (message.text.isNotBlank()) {
+                            viewModel.sendMessage(message.text)
+                            message = TextFieldValue("")
+                        }
+                    },
+                contentAlignment = androidx.compose.ui.Alignment.Center
             ) {
-                Text(text = "Send")
+                androidx.compose.material.Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.Send,
+                    contentDescription = "Send",
+                    tint = Color.White
+                )
             }
         }
     }
