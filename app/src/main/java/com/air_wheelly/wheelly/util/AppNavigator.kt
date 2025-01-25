@@ -40,6 +40,7 @@ fun AppNavigator(
         }
         composable("registration") {
             RegisterScreen(navController)
+
         }
         composable(route = "profile") {
             ProfileScreen(navController)
@@ -81,7 +82,9 @@ fun AppNavigator(
         composable(route = "chatScreen/{reservationId}", arguments = listOf(navArgument("reservationId") { type = NavType.StringType })) { backStackEntry ->
             val reservationId = backStackEntry.arguments?.getString("reservationId")
             reservationId?.let {
-                ChatScreen(reservationId = it)
+                user?.let { currentUser ->
+                    ChatScreen(reservationId = it, currentUserId = currentUser.id)
+                }
             }
         }
     }
