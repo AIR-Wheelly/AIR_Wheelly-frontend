@@ -39,8 +39,7 @@ fun ChatScreen(reservationId: String, currentUserId: String) {
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            reverseLayout = true
+                .padding(bottom = 8.dp)
         ) {
             items(chatMessages) { chatMessage ->
                 ChatBubble(
