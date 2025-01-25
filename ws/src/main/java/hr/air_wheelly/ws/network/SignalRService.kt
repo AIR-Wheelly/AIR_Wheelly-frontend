@@ -2,6 +2,7 @@ package hr.air_wheelly.ws.network
 
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
+import hr.air_wheelly.ws.models.ChatMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -30,9 +31,3 @@ class SignalRService(private val reservationId: String) {
         hubConnection.stop().blockingAwait()
     }
 }
-
-data class ChatMessage(
-    val reservationId: String,
-    val senderId: String,
-    val message: String
-)
