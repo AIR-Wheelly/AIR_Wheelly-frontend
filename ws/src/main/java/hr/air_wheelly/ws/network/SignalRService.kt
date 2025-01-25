@@ -1,16 +1,20 @@
 package hr.air_wheelly.ws.network
 
+import android.content.Context
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import hr.air_wheelly.ws.models.ChatMessage
+import hr.air_wheelly.ws.models.TokenManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SignalRService(private val reservationId: String) {
+class SignalRService(private val context: Context, private val reservationId: String) {
     private lateinit var hubConnection: HubConnection
 
     fun startConnection() {
-        hubConnection = HubConnectionBuilder.create("https://your-backend-url/chathub")
+        val token = TokenManager.getToken(context)
+        hubConnection = HubConnectionBuilder.create("http://10.0.2.2:8080/api/chathub")
+            .withHeader("Authorization", "Bearer $token")
             .build()
 
         hubConnection.on("ReceiveMessage", { message: ChatMessage ->
