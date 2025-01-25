@@ -83,4 +83,7 @@ dependencies {
 
     // BRAINTREE DROP-IN
     implementation ("com.braintreepayments.api:drop-in:6.13.0")
+
+    // SIGNAL R
+    implementation("com.microsoft.signalr:signalr:5.0.11")
 }
