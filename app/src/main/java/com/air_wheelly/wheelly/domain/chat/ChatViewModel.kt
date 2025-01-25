@@ -1,15 +1,20 @@
 package com.air_wheelly.wheelly.domain.chat
 
+import hr.air_wheelly.ws.network.SignalRService
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.air_wheelly.ws.models.ChatMessage
-import hr.air_wheelly.ws.network.SignalRService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ChatViewModel(private val context: Context, private val reservationId: String, private val currentUserId: String) : ViewModel() {
+class ChatViewModel(
+    private val context: Context,
+    private val reservationId: String,
+    private val currentUserId: String
+) : ViewModel() {
     private val signalRService = SignalRService(context, reservationId)
     private val _chatMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val chatMessages: StateFlow<List<ChatMessage>> = _chatMessages
@@ -17,15 +22,31 @@ class ChatViewModel(private val context: Context, private val reservationId: Str
     init {
         viewModelScope.launch {
             signalRService.startConnection()
+
+            signalRService.setOnMessageReceivedListener { newMessage ->
+                if (newMessage.senderId != currentUserId) {
+                    viewModelScope.launch {
+                        _chatMessages.value = (_chatMessages.value + newMessage).sortedBy { it.timestamp }
+                        Log.d("ChatViewModel", "New message received: $newMessage")
+                    }
+                }
+            }
         }
     }
 
     fun sendMessage(message: String) {
         viewModelScope.launch {
+            val timestamp = System.currentTimeMillis()
+            val newMessage = ChatMessage(
+                senderId = currentUserId,
+                reservationId = reservationId,
+                message = message,
+                timestamp = timestamp
+            )
+
             signalRService.sendMessage(message)
-            // Add the sent message to the chatMessages list
-            val newMessage = ChatMessage(senderId = currentUserId, reservationId = reservationId,message = message)
-            _chatMessages.value = _chatMessages.value + newMessage
+            _chatMessages.value = (_chatMessages.value + newMessage)
+            Log.d("ChatViewModel", "Message sent: $newMessage")
         }
     }
 

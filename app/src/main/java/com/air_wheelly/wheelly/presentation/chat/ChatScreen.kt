@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,18 +29,26 @@ fun ChatScreen(reservationId: String, currentUserId: String) {
     val viewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(context, reservationId, currentUserId))
     val chatMessages by viewModel.chatMessages.collectAsState()
     var message by remember { mutableStateOf(TextFieldValue("")) }
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(chatMessages) {
+        if (chatMessages.isNotEmpty()) {
+            listState.scrollToItem(chatMessages.size - 1)
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(bottom = 8.dp)
+                .padding(bottom = 8.dp),
+            reverseLayout = true
         ) {
             items(chatMessages) { chatMessage ->
                 ChatBubble(
@@ -52,8 +61,7 @@ fun ChatScreen(reservationId: String, currentUserId: String) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                .padding(horizontal = 8.dp)
         ) {
             BasicTextField(
                 value = message,
@@ -93,8 +101,7 @@ fun ChatScreen(reservationId: String, currentUserId: String) {
                         viewModel.sendMessage(message.text)
                         message = TextFieldValue("")
                     }
-                },
-                modifier = Modifier.padding(start = 8.dp)
+                }
             ) {
                 Text(text = "Send")
             }
