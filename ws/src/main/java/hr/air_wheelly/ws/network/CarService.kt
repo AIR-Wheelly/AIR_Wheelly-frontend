@@ -6,6 +6,7 @@ import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarModel
 import hr.air_wheelly.ws.models.responses.car.CreateNewReservationBody
 import hr.air_wheelly.ws.models.responses.car.NewCarBody
+import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -33,5 +34,8 @@ interface CarService {
 
     @POST("car/CreateRental")
     fun createRental(@Body reservationBody: CreateNewReservationBody): Call<SuccessfulResponseBody<Unit>>
+
+    @GET("car/GetReservationsForMyCars")
+    fun getReservationsForMyCars(): Call<SuccessfulResponseBody<List<PastReservationsResponse>>>
 
 }

@@ -12,6 +12,7 @@ import com.air_wheelly.wheelly.presentation.CarListingScreen
 import com.air_wheelly.wheelly.presentation.auth.LoginScreen
 import com.air_wheelly.wheelly.presentation.auth.RegisterScreen
 import com.air_wheelly.wheelly.presentation.car_list.CarList
+import com.air_wheelly.wheelly.presentation.chat.ChatScreen
 import com.air_wheelly.wheelly.presentation.payment.PaymentScreen
 import com.air_wheelly.wheelly.presentation.profile.ProfileScreen
 import com.air_wheelly.wheelly.presentation.reservations.CarReservationScreen
@@ -39,6 +40,7 @@ fun AppNavigator(
         }
         composable("registration") {
             RegisterScreen(navController)
+
         }
         composable(route = "profile") {
             ProfileScreen(navController)
@@ -75,6 +77,15 @@ fun AppNavigator(
         }
         composable(route = "statistics") {
             StatisticsScreen(navController)
+        }
+
+        composable(route = "chatScreen/{reservationId}", arguments = listOf(navArgument("reservationId") { type = NavType.StringType })) { backStackEntry ->
+            val reservationId = backStackEntry.arguments?.getString("reservationId")
+            reservationId?.let {
+                user?.let { currentUser ->
+                    ChatScreen(reservationId = it, currentUserId = currentUser.id)
+                }
+            }
         }
     }
 }
