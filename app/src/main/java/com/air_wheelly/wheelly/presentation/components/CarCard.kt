@@ -48,15 +48,7 @@ fun CarCard(car: CarListResponse, onClick: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "Model: ${car.model?.name}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "Fuel Type: ${car.fuelType}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "Seats: ${car.numberOfSeats}",
+                    text = "${car.model?.manufacturerName} ${car.model?.name}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(

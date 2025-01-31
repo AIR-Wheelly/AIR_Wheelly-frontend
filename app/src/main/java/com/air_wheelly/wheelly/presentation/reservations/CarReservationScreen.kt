@@ -68,7 +68,7 @@ fun CarReservationScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = it.model?.name ?: "Unknown Model",
+                    text = it.model?.manufacturerName + " " + it.model?.name,
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
