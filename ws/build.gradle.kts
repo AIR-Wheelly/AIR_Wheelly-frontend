@@ -5,11 +5,10 @@ plugins {
 
 android {
     namespace = "com.air_wheelly.wheelly.ws"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 34
+        minSdk = 34
     }
 
     compileOptions {
@@ -28,4 +27,8 @@ dependencies {
     implementation("com.microsoft.signalr:signalr:5.0.11")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
+    implementation ("io.reactivex.rxjava3:rxandroid:3.0.0")
+
 }
