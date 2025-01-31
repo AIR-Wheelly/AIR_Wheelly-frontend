@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.air_wheelly.wheelly"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.air_wheelly.wheelly"
