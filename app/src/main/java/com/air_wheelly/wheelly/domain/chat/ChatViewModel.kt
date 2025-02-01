@@ -1,6 +1,6 @@
 package com.air_wheelly.wheelly.domain.chat
 
-import hr.air_wheelly.ws.network.SignalRService
+import hr.air_wheelly.ws.network.ChatService
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -15,15 +15,15 @@ class ChatViewModel(
     private val reservationId: String,
     private val currentUserId: String
 ) : ViewModel() {
-    private val signalRService = SignalRService(context, reservationId)
+    private val chatService = ChatService(context, reservationId)
     private val _chatMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val chatMessages: StateFlow<List<ChatMessage>> = _chatMessages
 
     init {
         viewModelScope.launch {
-            signalRService.startConnection()
+            chatService.startConnection()
 
-            signalRService.setOnMessageReceivedListener { newMessage ->
+            chatService.setOnMessageReceivedListener { newMessage ->
                 if (newMessage.senderId != currentUserId) {
                     viewModelScope.launch {
                         _chatMessages.value = (_chatMessages.value + newMessage).sortedBy { it.timestamp }
@@ -44,7 +44,7 @@ class ChatViewModel(
                 timestamp = timestamp
             )
 
-            signalRService.sendMessage(message)
+            chatService.sendMessage(message)
             _chatMessages.value = (_chatMessages.value + newMessage)
             Log.d("ChatViewModel", "Message sent: $newMessage")
         }
@@ -52,6 +52,6 @@ class ChatViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        signalRService.stopConnection()
+        chatService.stopConnection()
     }
 }

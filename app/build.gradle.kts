@@ -10,7 +10,6 @@ android {
     defaultConfig {
         applicationId = "com.air_wheelly.wheelly"
         minSdk = 34
-        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -86,4 +85,10 @@ dependencies {
 
     // SIGNAL R
     implementation("com.microsoft.signalr:signalr:5.0.11")
+
+    //COIL for images
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+    //Pager for image gallery
+    implementation ("com.google.accompanist:accompanist-pager:0.20.0")
 }

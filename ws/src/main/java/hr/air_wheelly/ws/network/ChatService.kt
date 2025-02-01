@@ -6,10 +6,8 @@ import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import hr.air_wheelly.ws.models.ChatMessage
 import hr.air_wheelly.ws.models.TokenManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
-class SignalRService(private val context: Context, private val reservationId: String) {
+class ChatService(private val context: Context, private val reservationId: String) {
     private lateinit var hubConnection: HubConnection
     private var onMessageReceived: ((ChatMessage) -> Unit)? = null
 

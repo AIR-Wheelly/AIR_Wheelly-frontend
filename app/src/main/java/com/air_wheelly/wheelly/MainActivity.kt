@@ -1,5 +1,9 @@
 package com.air_wheelly.wheelly
 
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -12,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.air_wheelly.wheelly.ui.theme.WheellyTheme
@@ -25,6 +30,7 @@ import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.ws.models.body.CreatePurchaseBody
 import hr.air_wheelly.ws.models.responses.ProfileResponse
 import hr.air_wheelly.ws.models.responses.payment.CreatePurchaseResponse
+import hr.air_wheelly.ws.network.NotificationService
 import hr.air_wheelly.ws.request_handlers.CreateTransactionRequestHandler
 
 class MainActivity : FragmentActivity(), DropInListener {
@@ -39,6 +45,7 @@ class MainActivity : FragmentActivity(), DropInListener {
         val tokenizationKey = "sandbox_w3fdp93n_tmcvwzknv5w6689h"
         val dropInClient = DropInClient(this, tokenizationKey)
         dropInClient.setListener(this)
+        startNotificationService(this)
 
         onPurchaseInit = { reservationId, amount ->
             createPurchaseBody = CreatePurchaseBody(
@@ -88,6 +95,28 @@ class MainActivity : FragmentActivity(), DropInListener {
                     }
                 }
             }
+        }
+    }
+
+    private fun startNotificationService(context: Context) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(context, "android.permission.POST_NOTIFICATIONS")
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this@MainActivity,
+                    arrayOf("android.permission.POST_NOTIFICATIONS"),
+                    1001
+                )
+            }
+        }
+
+        val serviceIntent = Intent(context, NotificationService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(serviceIntent)
+        } else {
+            context.startService(serviceIntent)
         }
     }
 
