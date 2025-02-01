@@ -3,6 +3,9 @@ package com.air_wheelly.wheelly.presentation.reservations
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import android.graphics.BitmapFactory
+import android.util.Base64
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,6 +17,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,13 +26,62 @@ import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.CarReservationModel
 import com.air_wheelly.wheelly.domain.reservation.CarViewModel
 import com.air_wheelly.wheelly.domain.reservation.CarViewModelFactory
-import com.air_wheelly.wheelly.presentation.components.Base64Image
 import com.air_wheelly.wheelly.presentation.components.DatePicker
 import com.air_wheelly.wheelly.presentation.components.StarRating
 import hr.air_wheelly.ws.models.responses.CarListResponse
 import kotlinx.coroutines.launch
+import java.io.ByteArrayInputStream
 import java.time.LocalDate
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.ExperimentalPagerApi
 
+@Composable
+fun Base64Image(
+    base64String: String?,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop
+) {
+    base64String?.let {
+        val decoded = remember(it) { Base64.decode(it, Base64.DEFAULT) }
+        val bitmap = remember(decoded) {
+            val stream = ByteArrayInputStream(decoded)
+            BitmapFactory.decodeStream(stream)
+        }
+        bitmap?.let { bmp ->
+            Image(
+                bitmap = bmp.asImageBitmap(),
+                contentDescription = null,
+                modifier = modifier,
+                contentScale = contentScale
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun CarImagePager(
+    images: List<String>,
+    modifier: Modifier = Modifier
+) {
+    val pagerState = rememberPagerState()
+    HorizontalPager(
+        count = images.size,
+        state = pagerState,
+        modifier = modifier.fillMaxWidth()
+    ) { page ->
+        Base64Image(
+            base64String = images[page],
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 10f),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CarReservationScreen(
     navController: NavController,
@@ -46,41 +100,41 @@ fun CarReservationScreen(
             }
         }
     }
-
-
-    car?.let {
+    car?.let { carDetails ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            it.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
-                Base64Image(
-                    base64String = imageBase64,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                )
+            carDetails.carListingPictures?.let { pictures ->
+                val images = pictures.mapNotNull { it.image }
+                if (images.isNotEmpty()) {
+                    CarImagePager(
+                        images = images,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            //.padding(vertical = 10.dp)
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = it.model?.name ?: "Unknown Model",
+                    text = (carDetails.model?.manufacturerName ?: "") + " " + (carDetails.model?.name ?: ""),
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
-                    text = "${it.yearOfProduction} | ${it.fuelType} | ${it.numberOfSeats} Seats",
+                    text = "${carDetails.yearOfProduction} | ${carDetails.fuelType} | ${carDetails.numberOfSeats} Seats",
                     style = MaterialTheme.typography.bodyLarge
                 )
 
-                it.location?.let { location ->
+                carDetails.location?.let { location ->
                     val locationText = "Show on map"
-                    val locationUri = "geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(${location.adress})"
+                    val locationUri =
+                        "geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(${location.adress})"
 
                     Text(
                         text = locationText,
@@ -98,9 +152,8 @@ fun CarReservationScreen(
                 )
 
                 Text(
-                    text = "Rental Price: $${it.rentalPriceType}/day",
-                    style = MaterialTheme.typography.bodyLarge,
-                    //color = MaterialTheme.colorScheme.primary
+                    text = "Price: ${carDetails.rentalPriceType}EUR/day",
+                    style = MaterialTheme.typography.bodyLarge
                 )
 
                 Row(
@@ -142,7 +195,7 @@ fun CarReservationScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if (startDate.value != null && endDate.value != null) {
-                    val rentalPricePerDay = it.rentalPriceType?.toDouble() ?: 0.0
+                    val rentalPricePerDay = carDetails.rentalPriceType?.toDouble() ?: 0.0
                     val reservationModel = CarReservationModel(
                         startDate = startDate.value!!,
                         endDate = endDate.value!!,
@@ -164,10 +217,13 @@ fun CarReservationScreen(
                                 val reservationModel = CarReservationModel(
                                     startDate = startDate.value!!,
                                     endDate = endDate.value!!,
-                                    rentalPricePerDay = it.rentalPriceType?.toDouble() ?: 0.0
+                                    rentalPricePerDay = carDetails.rentalPriceType?.toDouble() ?: 0.0
                                 )
                                 coroutineScope.launch {
-                                    val result = reservationModel.createReservation(context, it.id ?: return@launch)
+                                    val result = reservationModel.createReservation(
+                                        context,
+                                        carDetails.id ?: return@launch
+                                    )
                                     if (result.isSuccess) {
                                         Toast.makeText(context, "Reservation successful", Toast.LENGTH_SHORT).show()
                                         navController.popBackStack()

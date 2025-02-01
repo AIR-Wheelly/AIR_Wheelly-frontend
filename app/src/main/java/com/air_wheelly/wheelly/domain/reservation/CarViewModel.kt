@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
+import android.net.Uri
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
@@ -16,6 +17,7 @@ import hr.air_wheelly.core.network.ResponseListener
 import hr.air_wheelly.core.network.models.ErrorResponseBody
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.ws.models.responses.CarListResponse
+import hr.air_wheelly.ws.models.responses.CarListingResponse
 import hr.air_wheelly.ws.models.responses.CarLocationResponse
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarLocationBody
@@ -25,6 +27,9 @@ import hr.air_wheelly.ws.request_handlers.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 
 class CarViewModel(
@@ -182,15 +187,15 @@ class CarViewModel(
         })
     }
 
-    fun createCarListing(newCarBody: NewCarBody, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun createCarListing(newCarBody: NewCarBody, onSuccess: (CarListingResponse) -> Unit, onError: (String) -> Unit) {
         val handler = CreateCarRequestHandler(context, newCarBody)
-        handler.sendRequest(object : ResponseListener<Unit> {
-            override fun onSuccessfulResponse(response: SuccessfulResponseBody<Unit>) {
+        handler.sendRequest(object : ResponseListener<CarListingResponse> {
+            override fun onSuccessfulResponse(response: SuccessfulResponseBody<CarListingResponse>) {
                 viewModelScope.launch {
                     _state.value = _state.value.copy(
                         successMessage = "Car was Successfully listed"
                     )
-                    onSuccess()
+                    onSuccess(response.result)
                 }
                 Log.d("CREATECARLISTING", "Success creating car listing")
             }
@@ -239,6 +244,62 @@ class CarViewModel(
         })
 
 
+    }
+
+    fun uploadCarImages(listingId: String, imageUris: List<Uri>, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        val contentResolver = context.contentResolver
+        val files = imageUris.mapIndexedNotNull { index, uri ->
+            try {
+                val inputStream = contentResolver.openInputStream(uri)
+                val bytes = inputStream?.readBytes()
+                inputStream?.close()
+                bytes?.let {
+                    val requestFile = it.toRequestBody("image/*".toMediaTypeOrNull())
+                    val fileName = "image_$index.jpg"
+                     MultipartBody.Part.createFormData("files", fileName, requestFile)
+                }
+            } catch (e: Exception) {
+                Log.e("UPLOAD", "Error processing image: ${e.localizedMessage}")
+                null
+            }
+        }
+
+        if (files.isEmpty()) {
+            onError("No valid images selected")
+            return
+        }
+
+        val listingIdRequestBody = listingId.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val handler = UploadCarImagesRequestHandler(context, listingIdRequestBody, files)
+        handler.sendRequest(object : ResponseListener<Unit> {
+            override fun onSuccessfulResponse(response: SuccessfulResponseBody<Unit>) {
+                viewModelScope.launch {
+                    _state.value = _state.value.copy(
+                        successMessage = "Images uploaded successfully!"
+                    )
+                    onSuccess()
+                }
+            }
+
+            override fun onErrorResponse(response: ErrorResponseBody) {
+                viewModelScope.launch {
+                    _state.value = _state.value.copy(
+                        errorMessage = "Failed to upload images"
+                    )
+                    onError(response.error_message)
+                }
+            }
+
+            override fun onNetworkFailure(t: Throwable) {
+                viewModelScope.launch {
+                    _state.value = _state.value.copy(
+                        errorMessage = "Network failure, please try again later"
+                    )
+                    onError("Network failure")
+                }
+            }
+        })
     }
 
     private fun logError(message: String) {

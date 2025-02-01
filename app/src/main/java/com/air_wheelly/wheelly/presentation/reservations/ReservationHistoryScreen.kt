@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material3.*
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,12 +28,12 @@ fun ReservationHistoryScreen(
 ) {
     val context = LocalContext.current
 
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    val tabTitles = listOf("User", "Renter")
+    var selectedFilter by remember { mutableStateOf(0) }
     var pastReservations by remember { mutableStateOf<List<PastReservationsResponse>?>(null) }
+    val tabOptions = listOf("User", "Renter")
 
-    LaunchedEffect(selectedTabIndex) {
-        val handler = if (selectedTabIndex == 0) {
+    LaunchedEffect(selectedFilter) {
+        val handler = if (selectedFilter == 0) {
             PastReservationsRequestHandler(context)
         } else {
             RenterReservationsRequestHandler(context)
@@ -61,18 +62,17 @@ fun ReservationHistoryScreen(
             .padding(0.dp)
     ) {
         TabRow(
-            selectedTabIndex = selectedTabIndex
+            selectedTabIndex = selectedFilter
         ) {
-            tabTitles.forEachIndexed { index, title ->
+            tabOptions.forEachIndexed { index, title ->
                 Tab(
-                    selected = selectedTabIndex == index,
-                    onClick = { selectedTabIndex = index },
+                    selected = selectedFilter == index,
+                    onClick = { selectedFilter = index },
                     text = { Text(title) }
                 )
             }
         }
 
-        // Reservations list
         Box(
             modifier = Modifier.weight(1f)
         ) {
@@ -87,7 +87,7 @@ fun ReservationHistoryScreen(
                 ) {
                     val gson = Gson()
                     pastReservations?.forEach { reservation ->
-                        if (selectedTabIndex == 0) {
+                        if (selectedFilter == 0) {
                             ReservationCard(
                                 reservation = reservation,
                                 onClick = { clickedReservation ->
@@ -98,7 +98,7 @@ fun ReservationHistoryScreen(
                                     navController.navigate("chatScreen/${longClickedReservation.id}")
                                 }
                             )
-                        } else if (selectedTabIndex == 1) {
+                        } else if (selectedFilter == 1) {
                             ReservationCard(
                                 reservation = reservation,
                                 onClick = { clickedReservation ->

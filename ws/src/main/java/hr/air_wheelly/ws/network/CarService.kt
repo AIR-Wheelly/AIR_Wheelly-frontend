@@ -2,16 +2,16 @@ package hr.air_wheelly.ws.network
 
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
 import hr.air_wheelly.ws.models.responses.CarListResponse
+import hr.air_wheelly.ws.models.responses.CarListingResponse
 import hr.air_wheelly.ws.models.responses.car.AllManufacturers
 import hr.air_wheelly.ws.models.responses.car.CarModel
 import hr.air_wheelly.ws.models.responses.car.CreateNewReservationBody
 import hr.air_wheelly.ws.models.responses.car.NewCarBody
 import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 
 interface CarService {
     @GET("car/getallmanafacturer")
@@ -24,7 +24,7 @@ interface CarService {
     fun getFuelTypes(): Call<SuccessfulResponseBody<Array<String>>>
 
     @POST("car/createcarlisting")
-    fun createCarListing(@Body newCarBody: NewCarBody): Call<SuccessfulResponseBody<Unit>>
+    fun createCarListing(@Body newCarBody: NewCarBody): Call<SuccessfulResponseBody<CarListingResponse>>
   
     @GET("car/carlistings")
     fun getListedCars(): Call<SuccessfulResponseBody<List<CarListResponse>>>
@@ -37,5 +37,12 @@ interface CarService {
 
     @GET("car/GetReservationsForMyCars")
     fun getReservationsForMyCars(): Call<SuccessfulResponseBody<List<PastReservationsResponse>>>
+
+    @Multipart
+    @POST("car/UploadCarListingPicture")
+    fun uploadCarImages(
+        @Part("listingId") listingId: RequestBody,
+        @Part files: List<MultipartBody.Part>
+    ): Call<SuccessfulResponseBody<Unit>>
 
 }
