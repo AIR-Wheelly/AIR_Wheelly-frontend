@@ -12,7 +12,8 @@ data class CarState(
     val models: List<CarModel> = emptyList(),
     val fuelTypes: List<String> = emptyList(),
     val currentLocation: LocationState? = null,
-    val carDetails: CarDetailsState? = null
+    val carDetails: CarDetailsState? = null,
+    val averageGrade: Float? = null
 ) : BaseState(isLoading, errorMessage)
 
 data class LocationState(

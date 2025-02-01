@@ -29,7 +29,6 @@ fun ReservationHistoryScreen(
     var selectedFilter by remember { mutableStateOf("User") }
     var pastReservations by remember { mutableStateOf<List<PastReservationsResponse>?>(null) }
 
-    // Fetch data dynamically based on the filter
     LaunchedEffect(selectedFilter) {
         val handler = if (selectedFilter == "User") {
             PastReservationsRequestHandler(context)
