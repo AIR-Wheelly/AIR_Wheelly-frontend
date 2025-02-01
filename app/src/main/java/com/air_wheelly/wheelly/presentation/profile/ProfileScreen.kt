@@ -72,7 +72,7 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                TextField(
+                OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
                     label = { Text("First Name") },
@@ -80,7 +80,7 @@ fun ProfileScreen(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                TextField(
+                OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = { Text("Last Name") },
@@ -88,7 +88,7 @@ fun ProfileScreen(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                TextField(
+                OutlinedTextField(
                     value = currentPassword,
                     onValueChange = { currentPassword = it },
                     label = { Text("Current Password") },
@@ -97,7 +97,7 @@ fun ProfileScreen(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                TextField(
+                OutlinedTextField(
                     value = newPassword,
                     onValueChange = { newPassword = it },
                     label = { Text("New Password") },
