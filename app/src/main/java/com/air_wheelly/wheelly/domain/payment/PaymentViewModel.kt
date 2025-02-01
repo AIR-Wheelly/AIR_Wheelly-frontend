@@ -61,9 +61,11 @@ class PaymentViewModel(
 
     fun launchPayment(dropInClient: DropInClient?, dropInRequest: DropInRequest) {
         if (dropInClient == null) return
-
         viewModelScope.launch {
             dropInClient.launchDropIn(dropInRequest)
+            _state.value = _state.value.copy(
+                isPayed = true
+            )
         }
     }
 
@@ -103,11 +105,19 @@ class PaymentViewModel(
                     }
 
                     override fun onErrorResponse(response: ErrorResponseBody) {
-                        Log.d("REVIEW", "Error: ${response.error_code}")
-                        _state.value = _state.value.copy(
-                            isLoading = false,
-                            errorMessage = "An Error occurred, please try again later!"
-                        )
+                        if (response.error_code == 0) {
+                            Log.d("REVIEW", "Error: User already reviewed this car!")
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                errorMessage = "You have already reviewed this car!"
+                            )
+                        } else {
+                            Log.d("REVIEW", "Error: ${response.error_code}")
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                errorMessage = "An Error occurred, please try again later!"
+                            )
+                        }
                     }
 
                     override fun onNetworkFailure(t: Throwable) {
