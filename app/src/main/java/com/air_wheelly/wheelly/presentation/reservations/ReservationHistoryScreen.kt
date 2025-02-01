@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,12 +28,12 @@ fun ReservationHistoryScreen(
 ) {
     val context = LocalContext.current
 
-    var selectedFilter by remember { mutableStateOf("User") }
+    var selectedFilter by remember { mutableStateOf(0) }
     var pastReservations by remember { mutableStateOf<List<PastReservationsResponse>?>(null) }
+    val tabOptions = listOf("User", "Renter")
 
-    // Fetch data dynamically based on the filter
     LaunchedEffect(selectedFilter) {
-        val handler = if (selectedFilter == "User") {
+        val handler = if (selectedFilter == 0) {
             PastReservationsRequestHandler(context)
         } else {
             RenterReservationsRequestHandler(context)
@@ -59,25 +61,18 @@ fun ReservationHistoryScreen(
             .fillMaxSize()
             .padding(0.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        TabRow(
+            selectedTabIndex = selectedFilter
         ) {
-            FilterButton(
-                text = "User",
-                isSelected = selectedFilter == "User",
-                onClick = { selectedFilter = "User" }
-            )
-            FilterButton(
-                text = "Renter",
-                isSelected = selectedFilter == "Renter",
-                onClick = { selectedFilter = "Renter" }
-            )
+            tabOptions.forEachIndexed { index, title ->
+                Tab(
+                    selected = selectedFilter == index,
+                    onClick = { selectedFilter = index },
+                    text = { Text(title) }
+                )
+            }
         }
 
-        // Reservations list
         Box(
             modifier = Modifier.weight(1f)
         ) {
@@ -92,7 +87,7 @@ fun ReservationHistoryScreen(
                 ) {
                     val gson = Gson()
                     pastReservations?.forEach { reservation ->
-                        if (selectedFilter == "User") {
+                        if (selectedFilter == 0) {
                             ReservationCard(
                                 reservation = reservation,
                                 onClick = { clickedReservation ->
@@ -103,7 +98,7 @@ fun ReservationHistoryScreen(
                                     navController.navigate("chatScreen/${longClickedReservation.id}")
                                 }
                             )
-                        } else if (selectedFilter == "Renter") {
+                        } else if (selectedFilter == 1) {
                             ReservationCard(
                                 reservation = reservation,
                                 onClick = { clickedReservation ->
@@ -122,31 +117,6 @@ fun ReservationHistoryScreen(
             modifier = Modifier
                 .padding(start = 0.dp, end = 0.dp)
                 .fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-fun FilterButton(
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    androidx.compose.material.Button(
-        onClick = onClick,
-        modifier = Modifier
-            .padding(4.dp),
-        elevation = androidx.compose.material.ButtonDefaults.elevation(
-            defaultElevation = if (isSelected) 8.dp else 2.dp
-        ),
-        colors = androidx.compose.material.ButtonDefaults.buttonColors(
-            backgroundColor = if (isSelected) androidx.compose.ui.graphics.Color(0xFF6200EE) else androidx.compose.ui.graphics.Color(0xFFE0E0E0),
-            contentColor = androidx.compose.ui.graphics.Color.White
-        )
-    ) {
-        Text(
-            text = text,
-            color = if (isSelected) androidx.compose.ui.graphics.Color.White else androidx.compose.ui.graphics.Color.Black
         )
     }
 }
