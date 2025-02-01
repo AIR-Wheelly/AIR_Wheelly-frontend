@@ -1,7 +1,12 @@
 package com.air_wheelly.wheelly.presentation.payment
 
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,81 +82,130 @@ fun PaymentScreen(
                     onDismiss = { viewModel.updateReviewState(false) }
                 )
             } else {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
                     state.carListingById?.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
                         Base64Image(
-                            imageBase64, modifier = Modifier
-                                .align(alignment = Alignment.CenterHorizontally)
-                                .size(300.dp)
-                                .padding(top = 16.dp)
+                            imageBase64,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(250.dp)
                         )
                     }
 
-                    Card(
+                    Spacer(modifier = Modifier.height(25.dp))
+
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        elevation = CardDefaults.cardElevation(4.dp)
+                            .padding(start = 16.dp, end = 16.dp)
                     ) {
-                        Row(
+
+                        Text(
+                            text = state.carListingById?.model?.name ?: "Unknown Model",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        Text(
+                            text = "${state.carListingById?.yearOfProduction} | ${state.carListingById?.fuelType} | ${state.carListingById?.numberOfSeats} Seats",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                        state.carListingById?.location?.let { location ->
+                            val locationText = "Show on map"
+                            val locationUri = "geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(${location.adress})"
+
+                            Text(
+                                text = locationText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.clickable {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(locationUri))
+                                    intent.setPackage("com.google.android.apps.maps")
+                                    context.startActivity(intent)
+                                }
+                            )
+                        } ?: Text(
+                            text = "Location: Unknown",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Text(
+                            text = "Rental Price: $${state.carListingById?.rentalPriceType}/day",
+                            style = MaterialTheme.typography.bodyLarge,
+                            //color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(top = 16.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = CardDefaults.cardElevation(4.dp)
                         ) {
-                            Column(
+
+                            Row(
                                 modifier = Modifier
-                                    .weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp, bottom = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Start Date: ${reservation?.startDate?.let { localDateFormatter.toLocalDate(it) }}")
-                                Text("End Date: ${reservation?.endDate?.let { localDateFormatter.toLocalDate(it) }}")
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 16.dp, end = 16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text("Start Date: ${reservation?.startDate?.let { localDateFormatter.toLocalDate(it) }}")
+                                    Text("End Date: ${reservation?.endDate?.let { localDateFormatter.toLocalDate(it) }}")
+                                }
                             }
                         }
-                    }
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        elevation = CardDefaults.cardElevation(4.dp)
-                    ) {
-                        Row(
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(top = 16.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = CardDefaults.cardElevation(4.dp)
                         ) {
-                            Column(
+                            Row(
                                 modifier = Modifier
-                                    .weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Amount to pay: ${reservation?.totalPrice}")
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text("Amount to pay: ${reservation?.totalPrice}")
+                                }
                             }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    if (!reservation!!.isPaid) {
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            onClick = { viewModel.updateReviewState(true) }
-                        ) {
-                            Text("Leave a review")
-                        }
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            onClick = { payForCarRent() }
-                        ) {
-                            Text("Pay")
+                        if (!reservation!!.isPaid && !state.isPayed) {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 75.dp),
+                                onClick = { viewModel.updateReviewState(true) }
+                            ) {
+                                Text("Leave a review")
+                            }
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                onClick = { payForCarRent() }
+                            ) {
+                                Text("Pay")
+                            }
                         }
                     }
                 }
