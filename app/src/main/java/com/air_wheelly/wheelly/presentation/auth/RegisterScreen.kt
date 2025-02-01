@@ -41,7 +41,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            TextField(
+            OutlinedTextField(
                 value = firstName,
                 onValueChange = { firstName = it },
                 label = { Text("First Name") },
@@ -59,7 +59,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextField(
+            OutlinedTextField(
                 value = lastName,
                 onValueChange = { lastName = it },
                 label = { Text("Last Name") },
@@ -77,7 +77,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextField(
+            OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
@@ -95,7 +95,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextField(
+            OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
@@ -114,7 +114,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextField(
+            OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
                 label = { Text("Confirm Password") },
