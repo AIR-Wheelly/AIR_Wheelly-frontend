@@ -2,7 +2,6 @@ package com.air_wheelly.wheelly.presentation.reservations
 
 import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material3.Tab
@@ -21,7 +20,6 @@ import hr.air_wheelly.ws.models.responses.reservation.PastReservationsResponse
 import hr.air_wheelly.ws.request_handlers.PastReservationsRequestHandler
 import hr.air_wheelly.ws.request_handlers.RenterReservationsRequestHandler
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ReservationHistoryScreen(
     navController: NavController

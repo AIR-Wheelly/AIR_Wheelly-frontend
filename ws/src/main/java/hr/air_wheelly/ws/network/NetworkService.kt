@@ -48,4 +48,8 @@ object NetworkService {
     fun statisticsService(context: Context): StatisticsService {
         return getRetrofitInstance(context).create(StatisticsService::class.java)
     }
+
+    fun reviewService(context: Context): ReviewService {
+        return getRetrofitInstance(context).create(ReviewService::class.java)
+    }
 }

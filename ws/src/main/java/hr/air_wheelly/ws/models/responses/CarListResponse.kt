@@ -1,6 +1,7 @@
 package hr.air_wheelly.ws.models.responses
 
 import hr.air_wheelly.core.util.CarLocation
+import hr.air_wheelly.ws.models.responses.car.Review
 
 data class CarListResponse(
     val id: String?,
@@ -18,7 +19,8 @@ data class CarListResponse(
     val userId: String?,
     val user: ProfileResponse?,
     val model: CarModel?,
-    val carListingPictures: List<CarListingPicture>
+    val carListingPictures: List<CarListingPicture>,
+    val reviews: List<Review>
 )
 
 data class CarListingPicture(
