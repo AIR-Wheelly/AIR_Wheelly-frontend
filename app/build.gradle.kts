@@ -91,4 +91,5 @@ dependencies {
 
     //Pager for image gallery
     implementation ("com.google.accompanist:accompanist-pager:0.20.0")
+    implementation ("androidx.compose.foundation:foundation:1.4.0")
 }
