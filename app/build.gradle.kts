@@ -85,4 +85,7 @@ dependencies {
 
     // SIGNAL R
     implementation("com.microsoft.signalr:signalr:5.0.11")
+
+    //COIL for images
+    implementation("io.coil-kt:coil-compose:2.2.2")
 }
