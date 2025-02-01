@@ -2,6 +2,7 @@ package com.air_wheelly.wheelly.domain.payment
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.braintreepayments.api.DropInClient
@@ -9,8 +10,11 @@ import com.braintreepayments.api.DropInRequest
 import hr.air_wheelly.core.network.ResponseListener
 import hr.air_wheelly.core.network.models.ErrorResponseBody
 import hr.air_wheelly.core.network.models.SuccessfulResponseBody
+import hr.air_wheelly.ws.models.body.ReviewBody
 import hr.air_wheelly.ws.models.responses.CarListResponse
+import hr.air_wheelly.ws.models.responses.ReviewResponse
 import hr.air_wheelly.ws.request_handlers.CarByIdRequestHandler
+import hr.air_wheelly.ws.request_handlers.ReviewRequestHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -67,5 +71,54 @@ class PaymentViewModel(
         _state.value = _state.value.copy(
             errorMessage = null
         )
+    }
+
+    fun updateReviewState(isShown: Boolean) {
+        _state.value = _state.value.copy(
+            review = isShown
+        )
+    }
+
+    fun submitReview(rating: Int, reservationId: String) {
+        Log.d("REVIEW", "Listing Id: " + reservationId)
+
+        _state.value = _state.value.copy(isLoading = true)
+        viewModelScope.launch {
+            val handler = ReviewRequestHandler(
+                context,
+                reviewBody = ReviewBody(
+                    grade = rating,
+                    listingId = reservationId
+                )
+            )
+
+            handler.sendRequest(
+                object : ResponseListener<ReviewResponse> {
+                    override fun onSuccessfulResponse(response: SuccessfulResponseBody<ReviewResponse>) {
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                        )
+                        Toast.makeText(context, "Your review was submitted!", Toast.LENGTH_SHORT).show()
+                        Log.d("REVIEW", "Review was submitted!")
+                    }
+
+                    override fun onErrorResponse(response: ErrorResponseBody) {
+                        Log.d("REVIEW", "Error: ${response.error_code}")
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                            errorMessage = "An Error occurred, please try again later!"
+                        )
+                    }
+
+                    override fun onNetworkFailure(t: Throwable) {
+                        Log.d("REVIEW", t.cause.toString())
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                            errorMessage = "An Error occurred, please try again later!"
+                        )
+                    }
+                }
+            )
+        }
     }
 }

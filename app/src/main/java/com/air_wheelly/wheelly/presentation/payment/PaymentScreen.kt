@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.payment.PaymentViewModel
 import com.air_wheelly.wheelly.domain.payment.PaymentViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.Base64Image
+import com.air_wheelly.wheelly.presentation.components.ReviewPopup
 import com.air_wheelly.wheelly.util.LocalDateFormatter
 import com.braintreepayments.api.DropInClient
 import com.braintreepayments.api.DropInRequest
@@ -66,6 +67,14 @@ fun PaymentScreen(
                     title = "Error",
                     message = state.errorMessage.toString(),
                     onDismiss = { viewModel.clearMessages() }
+                )
+            } else if (state.review) {
+                ReviewPopup(
+                    onConfirm = { rating ->
+                        viewModel.updateReviewState(false)
+                        viewModel.submitReview(rating, reservation!!.carListingId)
+                    },
+                    onDismiss = { viewModel.updateReviewState(false) }
                 )
             } else {
                 Column {
@@ -127,13 +136,23 @@ fun PaymentScreen(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        onClick = { payForCarRent() }
-                    ) {
-                        Text("Pay")
+                    if (!reservation!!.isPaid) {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            onClick = { viewModel.updateReviewState(true) }
+                        ) {
+                            Text("Leave a review")
+                        }
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            onClick = { payForCarRent() }
+                        ) {
+                            Text("Pay")
+                        }
                     }
                 }
             }
