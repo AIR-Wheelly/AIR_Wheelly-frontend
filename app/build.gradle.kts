@@ -88,4 +88,7 @@ dependencies {
 
     //COIL for images
     implementation("io.coil-kt:coil-compose:2.2.2")
+
+    //Pager for image gallery
+    implementation ("com.google.accompanist:accompanist-pager:0.20.0")
 }

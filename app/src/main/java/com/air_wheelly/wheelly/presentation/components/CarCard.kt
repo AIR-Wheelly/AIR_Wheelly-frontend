@@ -34,7 +34,16 @@ fun CarCard(car: CarListResponse, onClick: () -> Unit) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
+            car.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
+                Base64Image(
+                    base64String = imageBase64,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(end = 16.dp)
+                        .aspectRatio(6f / 5f),
+                    contentScale = ContentScale.Crop
+                )
+            } ?: Image(
                 painter = painterResource(id = R.drawable.ic_menu_gallery),
                 contentDescription = "Car image",
                 contentScale = ContentScale.Crop,
