@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import hr.air_wheelly.ws.models.responses.CarListResponse
 
@@ -21,56 +22,58 @@ import hr.air_wheelly.ws.models.responses.CarListResponse
 fun CarCard(car: CarListResponse, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(16.dp)
-            .clickable { onClick() },
+            .padding(8.dp)
+            .clickable { onClick() }
+            .aspectRatio(10f / 13f),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            car.carListingPictures?.firstOrNull()?.image?.let { imageBase64 ->
-                Base64Image(
-                    base64String = imageBase64,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .padding(end = 16.dp)
-                        .aspectRatio(6f / 5f),
-                    contentScale = ContentScale.Crop
-                )
-            } ?: Image(
-                painter = painterResource(id = R.drawable.ic_menu_gallery),
-                contentDescription = "Car image",
-                contentScale = ContentScale.Crop,
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Box(
                 modifier = Modifier
-                    .size(100.dp)
-                    .padding(end = 16.dp)
-            )
-
+                    .fillMaxWidth()
+                    .aspectRatio(14f / 10f)
+            ) {
+                if (!car.carListingPictures.isNullOrEmpty()) {
+                    car.carListingPictures.first().image?.let { imageBase64 ->
+                        Base64Image(
+                            base64String = imageBase64,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                } else {
+                    Image(
+                        painter = painterResource(id = android.R.drawable.ic_menu_gallery),
+                        contentDescription = "Car image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = "${car.model?.manufacturerName} ${car.model?.name}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${car.rentalPriceType} EUR/day",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Location: ${car.location?.adress ?: "Unknown"}",
+                    text = "${car.yearOfProduction} | ${car.fuelType}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Year: ${car.yearOfProduction}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "Rental Price: $${car.rentalPriceType}/day",
-                    style = MaterialTheme.typography.bodySmall
+                    text = "${car.location?.adress ?: "Unknown"}",
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
