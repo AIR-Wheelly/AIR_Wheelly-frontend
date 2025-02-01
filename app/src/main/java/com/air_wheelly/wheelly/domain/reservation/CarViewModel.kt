@@ -223,6 +223,9 @@ class CarViewModel(
             override fun onSuccessfulResponse(response: SuccessfulResponseBody<CarListResponse>) {
                 viewModelScope.launch {
                     onCarDetailsFetched(response.result)
+                    _state.value = _state.value.copy(
+                        averageGrade = response.result?.reviews?.takeIf { it.isNotEmpty() } ?.map { it.grade }?.average()?.toFloat() ?: 0f
+                    )
                 }
             }
 
@@ -234,6 +237,8 @@ class CarViewModel(
                 logError("Network failure")
             }
         })
+
+
     }
 
     private fun logError(message: String) {

@@ -23,6 +23,7 @@ import com.air_wheelly.wheelly.domain.reservation.CarViewModel
 import com.air_wheelly.wheelly.domain.reservation.CarViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.Base64Image
 import com.air_wheelly.wheelly.presentation.components.DatePicker
+import com.air_wheelly.wheelly.presentation.components.StarRating
 import hr.air_wheelly.ws.models.responses.CarListResponse
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -34,6 +35,7 @@ fun CarReservationScreen(
 ) {
     val carViewModel: CarViewModel = viewModel(factory = CarViewModelFactory(LocalContext.current))
     var car by remember { mutableStateOf<CarListResponse?>(null) }
+    val state by carViewModel.state.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -100,6 +102,22 @@ fun CarReservationScreen(
                     style = MaterialTheme.typography.bodyLarge,
                     //color = MaterialTheme.colorScheme.primary
                 )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                ) {
+                    StarRating(
+                        rating = state.averageGrade,
+                        starSize = 20.dp,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(
+                        text = "%.1f".format(state.averageGrade),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
