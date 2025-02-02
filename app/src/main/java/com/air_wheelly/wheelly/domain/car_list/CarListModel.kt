@@ -12,7 +12,7 @@ class CarListModel {
     ): List<CarListResponse> {
         return carList.filter { car ->
             (fuelTypes.isEmpty() || fuelTypes.contains(EnumFuelType.valueOf(car.fuelType!!.uppercase()))) &&
-                    (manufacturer.isEmpty() || car.model?.manufacturerId?.contains(manufacturer, ignoreCase = true) == true) &&
+                    (manufacturer.isEmpty() || car.model?.manufacturerName?.contains(manufacturer, ignoreCase = true) == true) &&
                     (year == null || car.yearOfProduction == year)
         }
     }
