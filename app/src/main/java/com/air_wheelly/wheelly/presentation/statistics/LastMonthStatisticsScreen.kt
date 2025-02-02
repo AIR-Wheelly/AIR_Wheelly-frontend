@@ -2,8 +2,8 @@ package com.air_wheelly.wheelly.presentation.statistics
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +20,7 @@ fun LastMonthStatisticsScreen(lastMonth: LastMonthResponse?) {
             .padding(start = 16.dp, end = 16.dp, top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Card(
+        ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()

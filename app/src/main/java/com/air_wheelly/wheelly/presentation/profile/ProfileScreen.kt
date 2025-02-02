@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import com.air_wheelly.wheelly.domain.profile.ProfileEditViewModel
 import com.air_wheelly.wheelly.domain.profile.ProfileEditViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.BottomNavigation
+import hr.air_wheelly.ws.models.TokenManager
 import hr.air_wheelly.ws.models.UpdateProfileRequest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +32,7 @@ fun ProfileScreen(
     var currentPassword by remember { mutableStateOf(state.currentPassword) }
     var newPassword by remember { mutableStateOf(state.newPassword) }
     var showDialog by remember { mutableStateOf(false) }
+    var showLogOutDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -72,7 +74,7 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                TextField(
+                OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
                     label = { Text("First Name") },
@@ -80,7 +82,7 @@ fun ProfileScreen(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                TextField(
+                OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = { Text("Last Name") },
@@ -88,7 +90,7 @@ fun ProfileScreen(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                TextField(
+                OutlinedTextField(
                     value = currentPassword,
                     onValueChange = { currentPassword = it },
                     label = { Text("Current Password") },
@@ -97,7 +99,7 @@ fun ProfileScreen(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                TextField(
+                OutlinedTextField(
                     value = newPassword,
                     onValueChange = { newPassword = it },
                     label = { Text("New Password") },
@@ -115,6 +117,14 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Save Changes")
+                }
+                Button(
+                    onClick = {
+                        showLogOutDialog = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Log Out")
                 }
             }
 
@@ -160,6 +170,31 @@ fun ProfileScreen(
                             showDialog = false
                         }
                     ) {
+                        Text("No")
+                    }
+                }
+            )
+        }
+        if (showLogOutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogOutDialog = false },
+                title = { Text("Logout") },
+                text = { Text("Are you sure you want to log out?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            TokenManager.clearToken(context)
+                            showLogOutDialog = false
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showLogOutDialog = false }) {
                         Text("No")
                     }
                 }

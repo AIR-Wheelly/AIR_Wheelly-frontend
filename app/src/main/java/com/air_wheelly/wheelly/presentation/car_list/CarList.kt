@@ -1,18 +1,21 @@
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -23,7 +26,9 @@ import com.air_wheelly.wheelly.presentation.components.BottomNavigation
 import com.air_wheelly.wheelly.presentation.components.CarCard
 import hr.air_wheelly.core.util.EnumFuelType
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun CarList(
     navController: NavController
@@ -77,9 +82,11 @@ fun CarList(
                                     .padding(16.dp)
                             ) {
                                 Divider(
-                                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                                    color = Color.DarkGray,
-                                    thickness = 4.dp,
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .fillMaxWidth(0.9f),
+                                    thickness = 3.dp,
+                                    color = MaterialTheme.colorScheme.outline,
                                 )
 
                                 Text(
@@ -107,7 +114,7 @@ fun CarList(
                                                         tempSelectedFuelType + fuelType
                                             },
                                             colors = ButtonDefaults.buttonColors(
-                                                backgroundColor = if (tempSelectedFuelType.contains(fuelType))
+                                                containerColor = if (tempSelectedFuelType.contains(fuelType))
                                                     MaterialTheme.colorScheme.primary
                                                 else
                                                     MaterialTheme.colorScheme.secondary
@@ -120,8 +127,7 @@ fun CarList(
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                Text("Manufacturer", style = MaterialTheme.typography.bodyLarge)
-                                TextField(
+                                OutlinedTextField(
                                     value = tempSelectedManufacturer,
                                     onValueChange = { tempSelectedManufacturer = it },
                                     label = { Text("Manufacturer") },
@@ -130,12 +136,12 @@ fun CarList(
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                Text("Year", style = MaterialTheme.typography.bodyLarge)
-                                TextField(
+                                OutlinedTextField(
                                     value = tempSelectedYear?.toString() ?: "",
                                     onValueChange = { tempSelectedYear = it.toIntOrNull() },
                                     label = { Text("Year") },
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                                 )
 
                                 Spacer(modifier = Modifier.height(16.dp))
@@ -153,7 +159,7 @@ fun CarList(
                                     Text("Apply Filters")
                                 }
 
-                                Button(
+                                FilledTonalButton(
                                     modifier = Modifier.fillMaxWidth(),
                                     onClick = {
                                         viewModel.clearFilters()
