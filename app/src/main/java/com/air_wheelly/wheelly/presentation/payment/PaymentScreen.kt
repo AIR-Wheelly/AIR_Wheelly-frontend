@@ -135,8 +135,7 @@ fun PaymentScreen(
 
                         Text(
                             text = "Rental Price: $${state.carListingById?.rentalPriceType}/day",
-                            style = MaterialTheme.typography.bodyLarge,
-                            //color = MaterialTheme.colorScheme.primary
+                            style = MaterialTheme.typography.bodyLarge
                         )
 
                         Card(

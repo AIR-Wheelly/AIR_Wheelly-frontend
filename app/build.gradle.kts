@@ -71,25 +71,19 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.4.0")
     implementation("androidx.compose.runtime:runtime-rxjava2:1.4.0")
 
-    // RETROFIT
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    // NAVIGATION
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("org.osmdroid:osmdroid-android:6.1.10")
 
-    // BRAINTREE DROP-IN
     implementation ("com.braintreepayments.api:drop-in:6.13.0")
 
-    // SIGNAL R
     implementation("com.microsoft.signalr:signalr:5.0.11")
 
-    //COIL for images
     implementation("io.coil-kt:coil-compose:2.2.2")
 
-    //Pager for image gallery
     implementation ("com.google.accompanist:accompanist-pager:0.20.0")
     implementation ("androidx.compose.foundation:foundation:1.4.0")
 }

@@ -1,10 +1,10 @@
 package com.air_wheelly.wheelly.presentation.reservations
 
 import android.content.Intent
-import android.net.Uri
-import android.widget.Toast
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Base64
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,13 +28,13 @@ import com.air_wheelly.wheelly.domain.reservation.CarViewModel
 import com.air_wheelly.wheelly.domain.reservation.CarViewModelFactory
 import com.air_wheelly.wheelly.presentation.components.DatePicker
 import com.air_wheelly.wheelly.presentation.components.StarRating
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import hr.air_wheelly.ws.models.responses.CarListResponse
 import kotlinx.coroutines.launch
 import java.io.ByteArrayInputStream
 import java.time.LocalDate
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
-import com.google.accompanist.pager.ExperimentalPagerApi
 
 @Composable
 fun Base64Image(
@@ -114,7 +114,6 @@ fun CarReservationScreen(
                         images = images,
                         modifier = Modifier
                             .fillMaxWidth()
-                            //.padding(vertical = 10.dp)
                     )
                 }
             }

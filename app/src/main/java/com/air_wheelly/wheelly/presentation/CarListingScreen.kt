@@ -11,11 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +40,6 @@ fun CarListingScreen(
     val carViewModel: CarViewModel = viewModel(factory = CarViewModelFactory(context))
     val state by carViewModel.state.collectAsState()
 
-    // States for dropdowns
     var selectedManufacturer by remember { mutableStateOf<AllManufacturers?>(null) }
     var selectedModel by remember { mutableStateOf<CarModel?>(null) }
     var selectedFuelType by remember { mutableStateOf<String?>(null) }
@@ -52,7 +47,6 @@ fun CarListingScreen(
     var expandedModel by remember { mutableStateOf(false) }
     var expandedFuelType by remember { mutableStateOf(false) }
 
-    // States for text fields
     var year by remember { mutableStateOf(TextFieldValue("")) }
     var seats by remember { mutableStateOf(TextFieldValue("")) }
     var rentalPrice by remember { mutableStateOf(TextFieldValue("")) }
@@ -60,11 +54,9 @@ fun CarListingScreen(
     var registrationNumber by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Message states
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
 
-    // For image selection
     val imageUris = remember { mutableStateListOf<Uri>() }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()

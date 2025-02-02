@@ -34,7 +34,6 @@ fun ReviewPopup(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Star rating row
                 Row(
                     modifier = Modifier.padding(vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center
@@ -54,7 +53,6 @@ fun ReviewPopup(
                     }
                 }
 
-                // Action buttons row
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

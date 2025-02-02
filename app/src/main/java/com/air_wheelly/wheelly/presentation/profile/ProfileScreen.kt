@@ -137,7 +137,6 @@ fun ProfileScreen(
                 .align(Alignment.BottomCenter)
         )
 
-        // Confirmation Dialog
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = {
