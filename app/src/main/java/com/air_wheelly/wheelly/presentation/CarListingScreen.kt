@@ -138,263 +138,255 @@ fun CarListingScreen(
                     )
                 }
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ExposedDropdownMenuBox(
+                    expanded = expandedManufacturer,
+                    onExpandedChange = { expandedManufacturer = !expandedManufacturer }
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-
-                        ExposedDropdownMenuBox(
-                            expanded = expandedManufacturer,
-                            onExpandedChange = { expandedManufacturer = !expandedManufacturer }
-                        ) {
-                            OutlinedTextField(
-                                value = selectedManufacturer?.name ?: "",
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("Manufacturer") },
-                                placeholder = { Text("Select Manufacturer") },
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedManufacturer)
-                                },
-                                modifier = Modifier
-                                    .menuAnchor()
-                                    .fillMaxWidth()
-                            )
-                            ExposedDropdownMenu(
-                                expanded = expandedManufacturer,
-                                onDismissRequest = { expandedManufacturer = false }
-                            ) {
-                                state.manufacturers.forEach { manufacturer ->
-                                    DropdownMenuItem(
-                                        text = { Text(manufacturer.name) },
-                                        onClick = {
-                                            selectedManufacturer = manufacturer
-                                            expandedManufacturer = false
-                                            carViewModel.fetchModels(manufacturer.id)
-                                        }
-                                    )
+                    OutlinedTextField(
+                        value = selectedManufacturer?.name ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Manufacturer") },
+                        placeholder = { Text("Select Manufacturer") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedManufacturer)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expandedManufacturer,
+                        onDismissRequest = { expandedManufacturer = false }
+                    ) {
+                        state.manufacturers.forEach { manufacturer ->
+                            DropdownMenuItem(
+                                text = { Text(manufacturer.name) },
+                                onClick = {
+                                    selectedManufacturer = manufacturer
+                                    expandedManufacturer = false
+                                    carViewModel.fetchModels(manufacturer.id)
                                 }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        ExposedDropdownMenuBox(
-                            expanded = expandedModel,
-                            onExpandedChange = { expandedModel = !expandedModel }
-                        ) {
-                            OutlinedTextField(
-                                value = selectedModel?.name ?: "",
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("Model") },
-                                placeholder = { Text("Select Model") },
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedModel)
-                                },
-                                modifier = Modifier
-                                    .menuAnchor()
-                                    .fillMaxWidth()
                             )
-                            ExposedDropdownMenu(
-                                expanded = expandedModel,
-                                onDismissRequest = { expandedModel = false }
-                            ) {
-                                state.models.forEach { model ->
-                                    DropdownMenuItem(
-                                        text = { Text(model.name) },
-                                        onClick = {
-                                            selectedModel = model
-                                            expandedModel = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        ExposedDropdownMenuBox(
-                            expanded = expandedFuelType,
-                            onExpandedChange = { expandedFuelType = !expandedFuelType }
-                        ) {
-                            OutlinedTextField(
-                                value = selectedFuelType ?: "",
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("Fuel Type") },
-                                placeholder = { Text("Select Fuel Type") },
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedFuelType)
-                                },
-                                modifier = Modifier
-                                    .menuAnchor()
-                                    .fillMaxWidth()
-                            )
-                            ExposedDropdownMenu(
-                                expanded = expandedFuelType,
-                                onDismissRequest = { expandedFuelType = false }
-                            ) {
-                                state.fuelTypes.forEach { fuelType ->
-                                    DropdownMenuItem(
-                                        text = { Text(fuelType) },
-                                        onClick = {
-                                            selectedFuelType = fuelType
-                                            expandedFuelType = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OutlinedTextField(
-                                value = year,
-                                onValueChange = { year = it },
-                                label = { Text("Year") },
-                                modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                singleLine = true
-                            )
-                            OutlinedTextField(
-                                value = seats,
-                                onValueChange = { seats = it },
-                                label = { Text("Seats") },
-                                modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                singleLine = true
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OutlinedTextField(
-                                value = rentalPrice,
-                                onValueChange = { rentalPrice = it },
-                                label = { Text("EUR/Day") },
-                                modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                singleLine = true
-                            )
-                            OutlinedTextField(
-                                value = numberOfKilometers,
-                                onValueChange = { numberOfKilometers = it },
-                                label = { Text("Kilometers") },
-                                modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                singleLine = true
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        OutlinedTextField(
-                            value = registrationNumber,
-                            onValueChange = { registrationNumber = it },
-                            label = { Text("License Plate") },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        OutlinedTextField(
-                            value = description,
-                            onValueChange = { description = it },
-                            label = { Text("Description") },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = false,
-                            maxLines = 3
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Button(
-                            onClick = { imagePickerLauncher.launch("image/*") },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Select Images")
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(imageUris) { uri ->
-                                Card(
-                                    modifier = Modifier.size(100.dp),
-                                    shape = MaterialTheme.shapes.medium,
-                                    elevation = CardDefaults.cardElevation(4.dp)
-                                ) {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(uri),
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize()
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Button(
-                            onClick = {
-                                if (selectedManufacturer == null || selectedModel == null || selectedFuelType == null ||
-                                    year.text.isEmpty() || seats.text.isEmpty() || rentalPrice.text.isEmpty() ||
-                                    numberOfKilometers.text.isEmpty() || registrationNumber.text.isEmpty() || description.text.isEmpty()
-                                ) {
-                                    errorMessage = "All fields are required!"
-                                } else {
-                                    carViewModel.getCurrentLocation(
-                                        onLocationReceived = { location ->
-                                            carViewModel.sendLocationToApi(location) { locationId ->
-                                                val newCarBody = NewCarBody(
-                                                    modelId = selectedModel!!.id,
-                                                    yearOfProduction = year.text.toInt(),
-                                                    fuelType = selectedFuelType!!,
-                                                    rentalPriceType = rentalPrice.text.toDouble(),
-                                                    numberOfSeats = seats.text.toInt(),
-                                                    locationId = locationId,
-                                                    numberOfKilometers = numberOfKilometers.text.toDouble(),
-                                                    registrationNumber = registrationNumber.text,
-                                                    description = description.text,
-                                                    userId = user.id
-                                                )
-
-                                                carViewModel.createCarListing(newCarBody, { response ->
-                                                    successMessage = "Car listed successfully!"
-                                                    navController.navigate("carList")
-                                                    val listingId = response.id
-                                                    if (imageUris.isNotEmpty()) {
-                                                        carViewModel.uploadCarImages(listingId, imageUris, {
-                                                        }, {
-                                                        })
-                                                    }
-                                                }, { error ->
-                                                    errorMessage = error
-                                                })
-                                            }
-                                        },
-                                        onError = { error -> errorMessage = error }
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("List Car")
                         }
                     }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                ExposedDropdownMenuBox(
+                    expanded = expandedModel,
+                    onExpandedChange = { expandedModel = !expandedModel }
+                ) {
+                    OutlinedTextField(
+                        value = selectedModel?.name ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Model") },
+                        placeholder = { Text("Select Model") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedModel)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expandedModel,
+                        onDismissRequest = { expandedModel = false }
+                    ) {
+                        state.models.forEach { model ->
+                            DropdownMenuItem(
+                                text = { Text(model.name) },
+                                onClick = {
+                                    selectedModel = model
+                                    expandedModel = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                ExposedDropdownMenuBox(
+                    expanded = expandedFuelType,
+                    onExpandedChange = { expandedFuelType = !expandedFuelType }
+                ) {
+                    OutlinedTextField(
+                        value = selectedFuelType ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Fuel Type") },
+                        placeholder = { Text("Select Fuel Type") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedFuelType)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expandedFuelType,
+                        onDismissRequest = { expandedFuelType = false }
+                    ) {
+                        state.fuelTypes.forEach { fuelType ->
+                            DropdownMenuItem(
+                                text = { Text(fuelType) },
+                                onClick = {
+                                    selectedFuelType = fuelType
+                                    expandedFuelType = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = year,
+                        onValueChange = { year = it },
+                        label = { Text("Year") },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = seats,
+                        onValueChange = { seats = it },
+                        label = { Text("Seats") },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = rentalPrice,
+                        onValueChange = { rentalPrice = it },
+                        label = { Text("EUR/Day") },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = numberOfKilometers,
+                        onValueChange = { numberOfKilometers = it },
+                        label = { Text("Kilometers") },
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = registrationNumber,
+                    onValueChange = { registrationNumber = it },
+                    label = { Text("License Plate") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = false,
+                    maxLines = 3
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { imagePickerLauncher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Select Images")
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(imageUris) { uri ->
+                        Card(
+                            modifier = Modifier.size(100.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Image(
+                                painter = rememberAsyncImagePainter(uri),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        if (selectedManufacturer == null || selectedModel == null || selectedFuelType == null ||
+                            year.text.isEmpty() || seats.text.isEmpty() || rentalPrice.text.isEmpty() ||
+                            numberOfKilometers.text.isEmpty() || registrationNumber.text.isEmpty() || description.text.isEmpty()
+                        ) {
+                            errorMessage = "All fields are required!"
+                        } else {
+                            carViewModel.getCurrentLocation(
+                                onLocationReceived = { location ->
+                                    carViewModel.sendLocationToApi(location) { locationId ->
+                                        val newCarBody = NewCarBody(
+                                            modelId = selectedModel!!.id,
+                                            yearOfProduction = year.text.toInt(),
+                                            fuelType = selectedFuelType!!,
+                                            rentalPriceType = rentalPrice.text.toDouble(),
+                                            numberOfSeats = seats.text.toInt(),
+                                            locationId = locationId,
+                                            numberOfKilometers = numberOfKilometers.text.toDouble(),
+                                            registrationNumber = registrationNumber.text,
+                                            description = description.text,
+                                            userId = user.id
+                                        )
+
+                                        carViewModel.createCarListing(newCarBody, { response ->
+                                            successMessage = "Car listed successfully!"
+                                            navController.navigate("carList")
+                                            val listingId = response.id
+                                            if (imageUris.isNotEmpty()) {
+                                                carViewModel.uploadCarImages(listingId, imageUris, {
+                                                }, {
+                                                })
+                                            }
+                                        }, { error ->
+                                            errorMessage = error
+                                        })
+                                    }
+                                },
+                                onError = { error -> errorMessage = error }
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("List Car")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
